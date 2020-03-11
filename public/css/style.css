@@ -1,0 +1,20 @@
+@font-face {
+    font-family: iran;
+    src: url('../webfonts/IRANSansWeb.ttf');
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: iran!important;
+    direction: rtl;
+}
+[v-cloak]{
+    display: none;
+}
+/* header */
+.header nav{
+    background: red!important;
+}
+.header nav a{
+    color:#fff;
+}

@@ -11,6 +11,10 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', 'HomeController@index');
+Route::get('/admin','AdminControler@index');
+Route::get('/getuser','HomeController@getuser');
+
+Route::group(['prefix'=>'admin'],function(){
+    Route::post('/login','HomeController@login');
 });

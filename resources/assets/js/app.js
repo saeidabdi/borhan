@@ -6,6 +6,8 @@
  */
 
 require('./bootstrap');
+import Swal from 'sweetalert2'
+import axios from 'axios';
 
 window.Vue = require('vue');
 
@@ -18,5 +20,51 @@ window.Vue = require('vue');
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+    data:{
+        username:'',pass:'',logined:'',name,admin:0,user_id:''
+    },
+    mounted() {
+        this.getuser();
+    },
+    methods:{
+        login(){
+            axios.
+                post('/admin/login',{
+                    username : this.username,
+                    pass : this.pass
+                    }).then(response=>{
+                        if(response.data.name){
+                            this.logined = 1;
+                            this.name = response.data.name;
+                            if(response.data.type == 1){
+                                this.admin = 1;
+                                Swal.fire('', 'مدیر گرامی '+this.name+' وارد شدید', 'success');
+                                location.href = '/admin'
+                                return;
+                            }
+                            Swal.fire('سلام', 'شما وارد شدید!', 'success')
+                        }else{
+                            Swal.fire('سلام', 'کاربر وجود ندارد!', 'error')
+                        }
+                        
+                    })
+        },
+        getuser() {
+            axios.get('/getuser').then(response => {
+                if (response.data.username != undefined) {
+                    this.logined = 1;
+                    this.name = response.data.name
+                    this.user_id = response.data.id
+
+                    if (response.data.type == 1) {
+                        this.admin = 1;
+                        return;
+                    }
+                } else {
+                    this.logined = '';
+                }
+            });
+        }
+    }
 });
