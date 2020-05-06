@@ -38,7 +38,7 @@
                         معلم
                         <i class="fas fa-chalkboard-teacher"></i>
                     </button>
-                    <button  class="btn_login btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0 col-md-4" type="submit" @click="login()">
+                    <button  class="btn_login btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0 col-md-4" type="submit" @click="admin_login()">
                         مدیر
                         <i class="fas fa-user"></i>
                     </button>
@@ -76,4 +76,8 @@
         </div> -->
     </div>
 </div>
+<loading :active.sync="isLoading" 
+         color="#fff"
+         background-color="#000"
+         loader="dots"></loading>
 @include('footer')

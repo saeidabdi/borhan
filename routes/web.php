@@ -12,9 +12,12 @@
 */
 
 Route::get('/', 'HomeController@index');
-Route::get('/admin','AdminControler@index');
-Route::get('/getuser','HomeController@getuser');
 
-Route::group(['prefix'=>'admin'],function(){
-    Route::post('/login','HomeController@login');
+Route::group(['prefix'=>'user'],function(){
+    Route::post('/login', 'UserController@login');
+    Route::get('/index', 'UserController@index');
+    Route::get('/getuser', 'UserController@getuser');
+    Route::get('/branch', 'UserController@branch');
+    Route::post('/add_branch', 'UserController@add_branch');
+    Route::get('/get_branch', 'UserController@get_branch');
 });
