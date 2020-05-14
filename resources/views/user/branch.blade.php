@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-        <table class="table table-striped table-bordered table-hover table-condensed">
+            <table v-if="!branch_id" class="table table-striped table-bordered table-hover table-condensed">
                 <thead>
                     <th>ردیف</th>
                     <th>نام</th>
@@ -53,14 +53,41 @@
                         <td>@{{branch.id}}</td>
                         <td>@{{branch.name}}</td>
                         <td>@{{branch.addr}}</td>
-                        <td v-if="branch.addr==0">مدرسه</td>
-                        <td v-if="branch.addr==1">آموزشگاه</td>
-                        <td class="td_edit" @click="count_edit(count.id)"><i class="fa fa-edit"></i></td>
-                        <td class="td_delete" @click="delete_count(count.id)"><i class="fa fa-trash"></i></td>
+                        <td v-if="branch.type==0">مدرسه</td>
+                        <td v-if="branch.type==1">آموزشگاه</td>
+                        <td class="td_edit" @click="branch_edit(branch)"><i class="fa fa-edit"></i></td>
+                        <td class="td_delete" @click="delete_branch(branch.id)"><i class="fa fa-trash"></i></td>
                     </tr>
                 </tbody>
 
             </table>
+            <div v-if="branch_id">
+                <div class="col-md-4 right" style="padding-top: 10px;">
+                    <div class="form-group">
+                        <label class="label cat_lable">نام شعبه(مدرسه و کنکور)</label>
+                        <input type="text" class="form-control" v-model="branch_name">
+                    </div>
+                </div>
+                <div class="col-md-4 right" style="padding-top: 10px;">
+                    <div class="form-group">
+                        <label class="label cat_lable">آدرس</label>
+                        <input type="text" class="form-control" v-model="branch_addr">
+                    </div>
+                </div>
+                <div class="col-md-4 right" style="padding-top: 10px;">
+                    <div class="form-group">
+                        <label class="label cat_lable">نوع</label>
+                        <select class="form-control" v-model="branch_type">
+                            <option value="0">مدرسه</option>
+                            <option value="1">آموزشگاه کنکور</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4 right list_button_insert">
+                    <button type="button" class="btn btn-warning" @click="add_branch()">ویرایش شعبه</button>
+                    <button type="button" class="btn btn_borhan" @click="()=>{branch_id=''}">انصراف</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

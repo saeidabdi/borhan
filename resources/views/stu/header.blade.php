@@ -16,15 +16,15 @@
     <div class="wrapper d-flex align-items-stretch" id="app" v-if="logined" v-cloak>
         <nav id="sidebar" class="order-last" class="img" style="background-image: url(/user/images/bg_1.jpg);" v-cloak>
             <div class="custom-menu">
-                <!-- <button type="button" id="sidebarCollapse" class="btn btn-primary">
-                    <i class="fa fa-bars"></i>
-                </button> -->
+                <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                    <!-- <i class="fa fa-bars"></i> -->
+                </button>
             </div>
             <div class="">
                 <h1>
                     <a class="logo">
                         @{{name}}
-                        <span v-if="type==1">مدیر ارشد</span>
+                        <span>دانش آموز</span>
                     </a>
                 </h1>
                 <ul class="list-unstyled components mb-5">

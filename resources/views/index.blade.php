@@ -20,7 +20,7 @@
                 <!-- =============== inputs and buttons ================ -->
                 <div class="col-lg-10 col-md-10 col-sx-10" style="float: right;">
                     <div style="margin-top: 65px;" class="input-group mb-2 login_inputs">
-                        <input dir="rtl" type="text" v-model="username" class="form-control" placeholder="نام کاربری ( شماره موبایل)">
+                        <input dir="rtl" type="text" v-model="username" class="form-control" placeholder="نام کاربری">
                         <i v-if="!username" class="fa fa-user"></i>
                         <i v-if="username" class="fa fa-user active"></i>
                     </div>
@@ -30,7 +30,7 @@
                         <i v-if="pass" class="fa fa-lock active"></i>
                     </div>
                     <!-- login -->
-                    <button class="btn_login btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0 col-md-4" type="submit" @click="login()">
+                    <button class="btn_login btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0 col-md-4" type="submit" @click="stu_login()">
                         دانش آموز
                         <i class="fas fa-graduation-cap"></i>
                     </button>
