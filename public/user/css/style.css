@@ -42,7 +42,9 @@ html {
   font-family: 'iran';
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); 
+  overflow-x: hidden;
+}
 
 article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
   display: block; }
@@ -8140,7 +8142,9 @@ body {
   line-height: 1.8;
   font-weight: normal;
   background: #fff;
-  color: gray; }
+  color: gray;
+  direction: rtl;
+}
 
 a {
   -webkit-transition: .3s all ease;
@@ -8181,14 +8185,16 @@ h1, h2, h3, h4, h5,
 #sidebar {
   min-width: 300px;
   max-width: 300px;
+  min-height: 100%;
   color: #fff;
   -webkit-transition: all 0.3s;
   -o-transition: all 0.3s;
   transition: all 0.3s;
-  position: relative;
-  z-index: 0;
+  position: absolute;
+  z-index: 1;
   direction: rtl;
   text-align: right;
+  margin-right: -300px;
  }
   #sidebar:after {
     position: absolute;
@@ -8382,4 +8388,107 @@ option{
 }
 .td_edit:hover i{
   color: green;
+}
+.all_content{
+  background: #f3f3f3;
+}
+.branch_item{
+  background: #fff;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 4px 0 #b9b9b9;
+}
+.branch_item:hover{
+  box-shadow: 0 2px 11px 0 #b9b9b9;
+}
+.branch_item>a{
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+  font-size: 250px;
+  text-align: center;
+}
+.branch_item>img{
+  width: 100%;
+}
+.h3_branch{
+  color: #555;
+  text-align: center;
+  font-size: 20px;
+}
+.onfilm_name{
+  position: absolute;
+  bottom: 91px;
+  left: 33px;
+  color: #ccc;
+  background: #5550;
+  z-index: 100000;
+  font-size: 30px;
+}
+video {
+  /* object-fit: cover; */
+}
+#myVideo {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  min-width: 100%; 
+  /* min-height: 100%; */
+}
+.content2 {
+  position: fixed;
+  bottom: 73px;
+  color: #f1f1f1;
+  padding: 20px;
+  left: 0;
+  z-index: 6;
+}
+.content2 h1{
+  color: #d6cdcd;
+}
+#myBtn {
+  width: 200px;
+  font-size: 18px;
+  padding: 10px;
+  border: none;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+#myBtn:hover {
+  background: #ddd;
+  color: black;
+}
+video::-webkit-media-controls-fullscreen-button {
+  display: none!important;
+}
+@media (max-width: 991.98px) {
+  video {
+    position: absolute;
+    transform: rotate(90deg);
+  
+    transform-origin: bottom left;
+    width: 100vh;
+    height: 100vw;
+    margin-top: -100vw;
+    object-fit: cover;
+  
+    z-index: 4;
+    visibility: visible;
+  } 
+  #myVideo{
+    top:0;
+  }
+  .content2{
+    transform: rotate(90deg);
+    top: 20px;
+    bottom: unset;
+    left: 5%;
+  }
+  .content2 h1{
+    font-size: 14px;
+  }
 }

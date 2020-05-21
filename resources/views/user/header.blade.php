@@ -16,9 +16,9 @@
     <div class="wrapper d-flex align-items-stretch" id="app" v-if="logined" v-cloak>
         <nav id="sidebar" class="order-last" class="img" style="background-image: url(/user/images/bg_1.jpg);" v-cloak>
             <div class="custom-menu">
-                <!-- <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                <button type="button" @click="btn_menu()" id="sidebarCollapse" class="btn btn-bars">
                     <i class="fa fa-bars"></i>
-                </button> -->
+                </button>
             </div>
             <div class="">
                 <h1>
@@ -70,13 +70,27 @@
                     <li class="active">
                         <a href="/user/film">
                             <span style="margin-left: 5px" class="fas fa-film mr-3"></span>
-                            مدیریت فیلم 
+                            مدیریت فیلم
                         </a>
                     </li>
+                    <li class="active dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">
+                            <span style="margin-left: 5px" class="fas fa-chart-bar mr-3"></span>
+                            گزارشات
+                        </a>
+                        <ul style="background: #ea4335 none repeat scroll 0% 0%;" class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li class="active">
+                                <a class="dropdown-item" href="/user/report">
+                                    <span style="margin-left: 5px" class="fas  fa-check-square mr-3"></span>
+                                    حضور و غیاب
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="active">
-                        <a  @click="exit_user()">
+                        <a @click="exit_user()">
                             <span style="margin-left: 5px" class="fas fa-sign-out-alt mr-3"></span>
-                             خروج 
+                            خروج
                         </a>
                     </li>
                 </ul>

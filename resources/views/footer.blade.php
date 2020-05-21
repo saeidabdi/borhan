@@ -4,6 +4,9 @@
     طراحی شده توسط <a style="color:#ff6b06;" href="http://app-web.ir">گروه نرم افزاری قلم</a>
 </div>
 </div>
+<div>
+<router-view></router-view>
+</div>
 
 
 

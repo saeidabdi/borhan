@@ -16,8 +16,8 @@
     <div class="wrapper d-flex align-items-stretch" id="app" v-if="logined" v-cloak>
         <nav id="sidebar" class="order-last" class="img" style="background-image: url(/user/images/bg_1.jpg);" v-cloak>
             <div class="custom-menu">
-                <button type="button" id="sidebarCollapse" class="btn btn-primary">
-                    <!-- <i class="fa fa-bars"></i> -->
+                <button type="button" @click="btn_menu()" id="sidebarCollapse" class="btn btn-bars">
+                    <i class="fa fa-bars"></i>
                 </button>
             </div>
             <div class="">
@@ -29,54 +29,15 @@
                 </h1>
                 <ul class="list-unstyled components mb-5">
                     <li class="active">
-                        <a href="/user/index"><span class="fas fa-tachometer-alt mr-3"></span> داشبورد</a>
-                    </li>
-                    <li class="active">
-                        <a href="/user/branch">
-                            <span style="margin-left: 5px" class="fas fa-university mr-3"></span>
-                            شعبات
+                        <a href="/stu/profile">
+                            <span style="margin-left: 5px" class="fas fa-user mr-3"></span>
+                            پروفایل
                         </a>
                     </li>
                     <li class="active">
-                        <a href="/user/paye">
-                            <span style="margin-left: 5px" class="fas fa-database mr-3"></span>
-                            پایه
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="/user/reshte">
-                            <span style="margin-left: 5px" class="fas fa-code-branch mr-3"></span>
-                            رشته
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="/user/dars">
-                            <span style="margin-left: 5px" class="fas fa-book mr-3"></span>
-                            دروس
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="/user/teacher">
-                            <span style="margin-left: 5px" class="fas fa-chalkboard-teacher mr-3"></span>
-                            مدیریت اساتید
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="/user/stu">
-                            <span style="margin-left: 5px" class="fas fa-graduation-cap mr-3"></span>
-                            مدیریت دانش آموزان
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="/user/film">
-                            <span style="margin-left: 5px" class="fas fa-film mr-3"></span>
-                            مدیریت فیلم 
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a  @click="exit_user()">
+                        <a @click="exit_user()">
                             <span style="margin-left: 5px" class="fas fa-sign-out-alt mr-3"></span>
-                             خروج 
+                            خروج
                         </a>
                     </li>
                 </ul>

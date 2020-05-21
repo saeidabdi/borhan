@@ -10,17 +10,29 @@ import Swal from 'sweetalert2'
 import axios from 'axios';
 
 window.Vue = require('vue');
+import VueRouter from 'vue-router'
+Vue.use(VueRouter)
+
 // loding component
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 // dropzone component
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
+// video
+
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+const routes = [
+    { path: '/lesson', name: 'lesson', component: require('./components/lesson.vue') }
+]
+const router = new VueRouter({
+    routes,
+    mode: 'history'
+})
 
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
 
@@ -31,9 +43,13 @@ const app = new Vue({
         teacher_name: '', teacher_pass: '', teacher_user: '', goto_class: '', teacher_id: '', teacher_class: [], all_teacher: [], search_item: '', teach_id: '',
         stu_name: '', stu_user: '', stu_pass: '', stu_id: '', stu_class: [], all_stu: [],
         film_name: '', film_addr: '', all_special_film: [], specail_ids: [], limit_times: [],
-        film_id: '', all_film: [],
+        film_id: '', all_film: [], i: 1, status: 0, message: '', view_id: '',all_absent:[],
     },
     mounted() {
+        var a = this;
+        window.addEventListener('popstate', (e) => {
+            a.status = a.status - 1;
+        })
         if (window.location.pathname.split('/')[1] == 'user') {
             this.getuser();
         } else if (window.location.pathname.split('/')[1] == 'stu') {
@@ -43,6 +59,7 @@ const app = new Vue({
     components: {
         Loading
     },
+    router,
     methods: {
         //******************* */ user
         // branch
@@ -73,13 +90,13 @@ const app = new Vue({
             // if (window.location.pathname != '/') {
             axios.get('/user/getuser').then(response => {
                 if (response.data.username != undefined) {
-                    if (window.location.pathname == '/user/branch' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film') {
+                    if (window.location.pathname == '/user/branch' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report') {
                         this.get_branch();
                     }
-                    if (window.location.pathname == '/user/paye' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film') {
+                    if (window.location.pathname == '/user/paye' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report') {
                         this.get_paye();
                     }
-                    if (window.location.pathname == '/user/reshte' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film') {
+                    if (window.location.pathname == '/user/reshte' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report') {
                         this.get_reshte();
                     }
                     this.logined = 1;
@@ -625,7 +642,28 @@ const app = new Vue({
 
                 });
         },
+        // report
+        report_absent(){
+            this.isLoading = true
+            axios
+                .post('/user/report_absent',{
+                    film_id : this.film_id,
+                    b_id : this.branch_id,
+                }).then(response=>{
+                    this.isLoading = false
+                    this.all_absent = response.data;
+                })
+        },
         // *********************** student
+        btn_menu() {
+            if (this.i == 0) {
+                $('#sidebar').css('margin-right', '-300px')
+                this.i = 1;
+            } else {
+                $('#sidebar').css('margin-right', '0px')
+                this.i = 0;
+            }
+        },
         stu_login() {
             this.isLoading = true;
             axios
@@ -636,8 +674,22 @@ const app = new Vue({
                 }).then(response => {
                     this.isLoading = false;
                     if (response.data.username != undefined) {
-                        Swal.fire('', 'دانش آموز گرامی ' + response.data.name + ' شما وارد شدید', 'success');
-                        location.href = "/stu/index";
+                        if (response.data.active == 1) {
+                            if (getCookie('user')) {
+                                Swal.fire('', 'دانش آموز گرامی ' + response.data.name + ' شما وارد شدید', 'success');
+                                location.href = "/stu/index";
+                            } else {
+                                Swal.fire('', 'این حساب فعال است', 'warning');
+                            }
+                        } else {
+                            // set cookie
+                            let d = new Date();
+                            d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000));
+                            let expires = "expires=" + d.toUTCString();
+                            document.cookie = "user=" + response.data.username + ";" + expires + ";path=/"
+                            Swal.fire('', 'دانش آموز گرامی ' + response.data.name + ' شما وارد شدید', 'success');
+                            location.href = "/stu/index";
+                        }
 
                     } else {
                         Swal.fire('', 'کاربر وجود ندارد', 'warning');
@@ -650,17 +702,110 @@ const app = new Vue({
                 });
         },
         getstu() {
-            axios.get('/stu/getstu').then(response => {
-                if (response.data.username != undefined) {
-                    this.logined = 1;
-                    this.stu_id = response.data.id
-                    this.username = response.data.username
-                    this.name = response.data.name
-                } else {
-                    // location.href = '/';
-                    this.logined = '';
-                }
-            });
+            axios
+                .get('/stu/getstu')
+                .then(response => {
+                    if (response.data.username != undefined) {
+                        if (window.location.pathname == '/stu/index') {
+                            this.get_branch_stu(response.data.id, response.data.p_id, response.data.r_id);
+                        }
+                        this.logined = 1;
+                        this.stu_id = response.data.id
+                        this.paye_id = response.data.p_id
+                        this.reshte_id = response.data.r_id
+                        this.username = response.data.username
+                        this.name = response.data.name
+                    } else {
+                        this.logined = '';
+                    }
+                });
         },
-    }
+        get_branch_stu(stu_id, p_id, r_id) {
+            this.isLoading = true
+            axios
+                .post('/stu/get_branch_stu', {
+                    id: stu_id,
+                    p_id: p_id,
+                    r_id: r_id
+                }).then(response => {
+                    this.isLoading = false;
+                    this.status = response.data.status;
+                    if (response.data.status == 0) {
+                        this.all_branch = response.data.branch;
+                    } else {
+                        this.all_lesson = response.data.lesson;
+                    }
+                })
+        },
+        show_dars(b_id, type) {
+            this.branch_id = b_id;
+            this.isLoading = true
+            axios
+                .post('/stu/show_dars', {
+                    s_id: this.stu_id,
+                    b_id: b_id,
+                    type: type,
+                    p_id: this.paye_id,
+                    r_id: this.reshte_id
+                }).then(response => {
+                    this.isLoading = false;
+                    this.status = 1;
+                    this.$router.push('/stu/lesson');
+                    this.all_lesson = response.data.lesson;
+                })
+        },
+        show_film(lesson_id) {
+            this.message = '';
+            this.isLoading = true
+            axios
+                .post('/stu/show_film', {
+                    l_id: lesson_id,
+                    b_id: this.branch_id,
+                    p_id: this.paye_id,
+                    r_id: this.reshte_id
+                }).then(response => {
+                    this.isLoading = false;
+                    this.status = 2;
+                    this.$router.push('/stu/film');
+
+                    if (response.data.film != 0) {
+                        console.log(response.data.film)
+                        this.all_film = response.data.film;
+                    } else {
+                        this.message = 'هیچ فیلمی موجود نمیباشد';
+                    }
+                })
+        },
+        play_film(film_id) {
+            this.isLoading = true
+            axios
+                .post('/stu/play_film', {
+                    film_id: film_id,
+                    stu_id: this.stu_id,
+                    b_id: this.branch_id,
+                }).then(response => {
+                    this.isLoading = false;
+                    this.status = 3;
+                    this.$router.push('/stu/play_film');
+                    this.film_addr = response.data.film.addr;
+                    this.view_id = response.data.view_id;
+                })
+        },
+        onEnd() {
+            axios
+                .post('/stu/onEnd', {
+                    view_id: this.view_id,
+                })
+        },
+    },
 });
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}

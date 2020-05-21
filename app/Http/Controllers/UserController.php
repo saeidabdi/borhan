@@ -15,7 +15,7 @@ use App\StuManagement;
 use App\Teacher;
 use App\TeacherManage;
 use DB;
-use Illuminate\Support\Facades\Validator;
+use Verta;
 use Session;
 
 class UserController extends Controller
@@ -413,11 +413,11 @@ class UserController extends Controller
     public function change_lesson(Request $request)
     {
         $teachers = DB::table('teacher_management')
-        ->where('teacher_management.l_id', $request->l_id)
-        ->distinct('teacher_management.t_id')
-        ->leftJoin('teacher', 'teacher_management.t_id', '=', 'teacher.id')
-        ->select('teacher.id','teacher.name')
-        ->get();
+            ->where('teacher_management.l_id', $request->l_id)
+            ->distinct('teacher_management.t_id')
+            ->leftJoin('teacher', 'teacher_management.t_id', '=', 'teacher.id')
+            ->select('teacher.id', 'teacher.name')
+            ->get();
 
         return $teachers;
     }
@@ -430,23 +430,23 @@ class UserController extends Controller
         // $validator = Validator::make($request->all(), [
         //     'file' => 'max:500000', //5MB 
         // ]);
-    	$imageName = time().'.'.$request->file->getClientOriginalExtension();
+        $imageName = time() . '.' . $request->file->getClientOriginalExtension();
         $request->file->move(public_path('images'), $imageName);
-         
-    	return response()->json($imageName);
+
+        return response()->json($imageName);
     }
 
     public function add_film(Request $request)
     {
         $special_film = DB::table('teacher_management')
-        ->where('t_id',$request->t_id)
-        ->where('l_id',$request->l_id)
-        ->leftJoin('branch', 'teacher_management.b_id', '=', 'branch.id')
-        ->leftJoin('paye', 'teacher_management.p_id', '=', 'paye.id')
-        ->leftJoin('reshte', 'teacher_management.r_id', '=', 'reshte.id')
-        ->leftJoin('lesson', 'teacher_management.l_id', '=', 'lesson.id')
-        ->select('teacher_management.id', 'branch.name as b_name', 'paye.title as p_name', 'reshte.title as r_name', 'lesson.name as l_name', 'branch.id as b_id')
-        ->get();
+            ->where('t_id', $request->t_id)
+            ->where('l_id', $request->l_id)
+            ->leftJoin('branch', 'teacher_management.b_id', '=', 'branch.id')
+            ->leftJoin('paye', 'teacher_management.p_id', '=', 'paye.id')
+            ->leftJoin('reshte', 'teacher_management.r_id', '=', 'reshte.id')
+            ->leftJoin('lesson', 'teacher_management.l_id', '=', 'lesson.id')
+            ->select('teacher_management.id', 'branch.name as b_name', 'paye.title as p_name', 'reshte.title as r_name', 'lesson.name as l_name', 'branch.id as b_id')
+            ->get();
         $id = $request->id;
         if ($id) {
             $new_film = Teacher::where('id', $id)->first();
@@ -466,29 +466,28 @@ class UserController extends Controller
             $new_film->t_id = $request->t_id;
 
             if ($new_film->save()) {
-                return response()->json(['mes' => 'فیلم جدید ایجاد شد', 'id' => $new_film->id,'special_film'=>$special_film]);
+                return response()->json(['mes' => 'فیلم جدید ایجاد شد', 'id' => $new_film->id, 'special_film' => $special_film]);
             }
         }
-
     }
 
     public function allow_show(Request $request)
     {
         $a  = Special_film::insert([
-            'film_id'=> $request->film_id,
-            'b_id'=> $request->b_id,
-            'tm_id'=> $request->s_id,
-            'time_added'=> time(),
-            'limit_time'=> $request->limit_time
+            'film_id' => $request->film_id,
+            'b_id' => $request->b_id,
+            'tm_id' => $request->s_id,
+            'time_added' => time(),
+            'limit_time' => $request->limit_time
         ]);
-        if($a){
+        if ($a) {
             return response()->json(['mes' => 'فیلم مجاز شد']);
         }
     }
 
     public function get_film(Request $request)
     {
-        $all_paye = Film::where('l_id',$request->l_id)->where('t_id',$request->t_id)->get();
+        $all_paye = Film::where('l_id', $request->l_id)->where('t_id', $request->t_id)->get();
         return $all_paye;
     }
 
@@ -502,21 +501,21 @@ class UserController extends Controller
     public function edit_filmfunc(Request $request)
     {
         $special_film = DB::table('teacher_management')
-        ->where('t_id',$request->t_id)
-        ->where('l_id',$request->l_id)
-        ->leftJoin('branch', 'teacher_management.b_id', '=', 'branch.id')
-        ->leftJoin('paye', 'teacher_management.p_id', '=', 'paye.id')
-        ->leftJoin('reshte', 'teacher_management.r_id', '=', 'reshte.id')
-        ->leftJoin('lesson', 'teacher_management.l_id', '=', 'lesson.id')
-        ->select('teacher_management.id', 'branch.name as b_name', 'paye.title as p_name', 'reshte.title as r_name', 'lesson.name as l_name', 'branch.id as b_id')
-        ->get();
+            ->where('t_id', $request->t_id)
+            ->where('l_id', $request->l_id)
+            ->leftJoin('branch', 'teacher_management.b_id', '=', 'branch.id')
+            ->leftJoin('paye', 'teacher_management.p_id', '=', 'paye.id')
+            ->leftJoin('reshte', 'teacher_management.r_id', '=', 'reshte.id')
+            ->leftJoin('lesson', 'teacher_management.l_id', '=', 'lesson.id')
+            ->select('teacher_management.id', 'branch.name as b_name', 'paye.title as p_name', 'reshte.title as r_name', 'lesson.name as l_name', 'branch.id as b_id')
+            ->get();
 
-        $film_branch_ids = Special_film::where('film_id',$request->id)->select('tm_id','limit_time')->get();
+        $film_branch_ids = Special_film::where('film_id', $request->id)->select('tm_id', 'limit_time')->get();
 
-        $all_paye = Film::where('id',$request->id)->update([
-            'title'=>$request->title
+        $all_paye = Film::where('id', $request->id)->update([
+            'title' => $request->title
         ]);
-        return response()->json(['mes' => 'فیلم بروزرسانی شد','special_film'=>$special_film,'film_branch_ids'=>$film_branch_ids]);
+        return response()->json(['mes' => 'فیلم بروزرسانی شد', 'special_film' => $special_film, 'film_branch_ids' => $film_branch_ids]);
     }
 
     public function exit_user()
@@ -525,5 +524,40 @@ class UserController extends Controller
         if ($exit_user) {
             return true;
         }
+    }
+
+    public function report()
+    {
+        return view('user.report');
+    }
+
+    public function report_absent(Request $request)
+    {
+
+        $absent = DB::table('views_film')
+            ->where('views_film.film_id', $request->film_id)
+            ->where('views_film.b_id', $request->b_id)
+            ->leftJoin('stu', 'views_film.stu_id', '=', 'stu.id')
+            ->select('views_film.*', 'stu.username', 'stu.name')
+            ->get();
+
+        foreach ($absent as $key => $value) {
+
+            if ($absent[$key]->close_time) {
+                $extra = $absent[$key]->close_time - $absent[$key]->open_time;
+                $absent[$key]->extra = $extra;
+
+                $n = Verta::createTimestamp((int) $absent[$key]->close_time);
+                $absent[$key]->close_time = $n->formatDatetime();
+            }else{
+                $absent[$key]->extra='';    $absent[$key]->close_time = '';
+            }
+
+
+            $v = Verta::createTimestamp((int) $absent[$key]->open_time);
+            $absent[$key]->open_time = $v->formatDatetime();
+        }
+
+        return $absent;
     }
 }
