@@ -43,7 +43,9 @@ const app = new Vue({
         teacher_name: '', teacher_pass: '', teacher_user: '', goto_class: '', teacher_id: '', teacher_class: [], all_teacher: [], search_item: '', teach_id: '',
         stu_name: '', stu_user: '', stu_pass: '', stu_id: '', stu_class: [], all_stu: [],
         film_name: '', film_addr: '', all_special_film: [], specail_ids: [], limit_times: [],
-        film_id: '', all_film: [], i: 1, status: 0, message: '', view_id: '',all_absent:[],
+        film_id: '', all_film: [], i: 1, status: 0, message: '', view_id: '', all_absent: [],
+        new_pass: '', new_pass2: '',
+        stu_count:'',teacher_count:'',film_count:'',branch_count:'',
     },
     mounted() {
         var a = this;
@@ -62,6 +64,21 @@ const app = new Vue({
     router,
     methods: {
         //******************* */ user
+        // index
+        get_index(){
+            this.isLoading = true
+            axios
+                .get('/user/get_index')
+                .then(response=>{
+                    this.stu_count = response.data.stu;
+                    this.teacher_count = response.data.teacher;
+                    this.film_count = response.data.film;
+                    this.branch_count = response.data.branch;
+                    this.teacher_name = response.data.activest_teacher.name;
+                    this.stu_name = response.data.activest_student.name;
+                    this.isLoading = false;
+                })
+        },
         // branch
         admin_login() {
             this.isLoading = true;
@@ -98,6 +115,9 @@ const app = new Vue({
                     }
                     if (window.location.pathname == '/user/reshte' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report') {
                         this.get_reshte();
+                    }
+                    if(window.location.pathname == '/user/index'){
+                        this.get_index();
                     }
                     this.logined = 1;
                     this.user_id = response.data.id
@@ -518,9 +538,28 @@ const app = new Vue({
             this.paye_id = stu.p_id;
             this.reshte_id = stu.r_id;
         },
+        edit_active(stu) {
+            var active;
+            stu.active==1 ? active = 0 : active = 1;
+
+            this.isLoading = true
+            axios
+                .post('/user/edit_active', {
+                    id: stu.id,
+                    activ : active
+                }).then(response => {
+                    this.isLoading = false
+                    this.get_stu();    
+                    active == 1 ?
+                        Swal.fire('', 'وضعیت فعال شد', 'success')
+                        :
+                        Swal.fire('', 'وضعیت غیر فعال شد', 'success');
+                })
+        },
         // film
         change_lesson() {
             this.all_teacher = [];
+            this.all_film = [];
             this.isLoading = true;
             axios
                 .post('/user/change_lesson', {
@@ -643,16 +682,33 @@ const app = new Vue({
                 });
         },
         // report
-        report_absent(){
+        report_absent() {
             this.isLoading = true
             axios
-                .post('/user/report_absent',{
-                    film_id : this.film_id,
-                    b_id : this.branch_id,
-                }).then(response=>{
+                .post('/user/report_absent', {
+                    film_id: this.film_id,
+                    b_id: this.branch_id,
+                }).then(response => {
                     this.isLoading = false
                     this.all_absent = response.data;
                 })
+        },
+        // pass
+        edit_pass_user(){
+            if ((this.pass && this.new_pass && this.new_pass2) && this.new_pass == this.new_pass2) {
+                this.isLoading = true
+                axios
+                    .post('/user/edit_pass', {
+                        stu_id: this.user_id,
+                        pass: this.pass,
+                        new_pass: this.new_pass,
+                    }).then(response => {
+                        this.isLoading = false
+                        Swal.fire('', response.data.mes, '');
+                    })
+            } else {
+                Swal.fire('', 'کلمه عبور با تکرارش مطابقیت ندارد', 'warning');
+            }
         },
         // *********************** student
         btn_menu() {
@@ -708,6 +764,9 @@ const app = new Vue({
                     if (response.data.username != undefined) {
                         if (window.location.pathname == '/stu/index') {
                             this.get_branch_stu(response.data.id, response.data.p_id, response.data.r_id);
+                        }
+                        if (window.location.pathname == '/stu/profile') {
+                            this.get_profile_stu(response.data.id);
                         }
                         this.logined = 1;
                         this.stu_id = response.data.id
@@ -797,6 +856,37 @@ const app = new Vue({
                     view_id: this.view_id,
                 })
         },
+        // profile
+        get_profile_stu(id) {
+            this.isLoading = true
+            axios
+                .post('/stu/get_profile_stu', {
+                    id: id,
+                }).then(response => {
+                    this.name = response.data[0].name;
+                    this.username = response.data[0].username;
+                    this.paye_name = response.data[0].p_title;
+                    this.reshte_name = response.data[0].r_title;
+                    this.isLoading = false;
+                })
+        },
+        // pass
+        edit_pass() {
+            if ((this.pass && this.new_pass && this.new_pass2) && this.new_pass == this.new_pass2) {
+                this.isLoading = true
+                axios
+                    .post('/stu/edit_pass', {
+                        stu_id: this.stu_id,
+                        pass: this.pass,
+                        new_pass: this.new_pass,
+                    }).then(response => {
+                        this.isLoading = false
+                        Swal.fire('', response.data.mes, '');
+                    })
+            } else {
+                Swal.fire('', 'کلمه عبور با تکرارش مطابقیت ندارد', 'warning');
+            }
+        }
     },
 });
 function getCookie(name) {

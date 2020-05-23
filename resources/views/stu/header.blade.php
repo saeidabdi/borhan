@@ -29,9 +29,21 @@
                 </h1>
                 <ul class="list-unstyled components mb-5">
                     <li class="active">
+                        <a href="/stu/index">
+                            <span style="margin-left: 5px" class="fas fa-film mr-3"></span>
+                            فیلم
+                        </a>
+                    </li>
+                    <li class="active">
                         <a href="/stu/profile">
                             <span style="margin-left: 5px" class="fas fa-user mr-3"></span>
                             پروفایل
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="/stu/pass">
+                            <span style="margin-left: 5px" class="fas fa-key mr-3"></span>
+                            تغیر کلمه عبور
                         </a>
                     </li>
                     <li class="active">

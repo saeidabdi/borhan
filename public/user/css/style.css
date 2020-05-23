@@ -8400,6 +8400,7 @@ option{
   border-radius: 8px;
   cursor: pointer;
   box-shadow: 0 1px 4px 0 #b9b9b9;
+  padding-top: 10px;
 }
 .branch_item:hover{
   box-shadow: 0 2px 11px 0 #b9b9b9;
@@ -8491,4 +8492,33 @@ video::-webkit-media-controls-fullscreen-button {
   .content2 h1{
     font-size: 14px;
   }
+}
+/* profile */
+.stu_name{
+  text-align: center;
+}
+.stu_name h1{
+  font-size: 30px;
+  color: #555;
+  margin: 2px 0 30px 0;
+}
+.stu_icon_p{
+  text-align: center;
+}
+.stu_icon{
+  width: 207px;
+  height: 180px;
+  margin: 0 auto;
+}
+.all_pro{
+  background: #fff;
+  margin-top: -9px;
+  padding: 20px;
+  border-radius: 5px;
+}
+.cl_in_b{
+  display: inline-block;
+}
+.table{
+  overflow: scroll;
 }

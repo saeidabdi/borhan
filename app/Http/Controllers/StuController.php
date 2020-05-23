@@ -147,8 +147,43 @@ class StuController extends Controller
         ]);
     }
 
+    // profile
     public function profile()
     {
         return view('stu.profile');
+    }
+    public function get_profile_stu(Request $request)
+    {
+        $stu = DB::table('stu')
+        ->where('stu.id', $request->id)
+        ->leftJoin('paye', 'stu.p_id', '=', 'paye.id')
+        ->leftJoin('reshte', 'stu.r_id', '=', 'reshte.id')
+        ->select('stu.name','stu.username','paye.title as p_title','reshte.title as r_title')
+        ->get();
+
+        return $stu;
+    }
+
+    // pass
+    public function pass()
+    {
+        return view('stu.pass');
+    }
+
+    public function edit_pass(Request $request)
+    {
+        $stu = Stu::
+        where('id', $request->stu_id)
+        ->where('pass', $request->pass)
+        ->first();
+
+        if($stu){
+            $stu->pass = $request->new_pass;
+            if($stu->update()){
+                return response()->json(['mes' => 'کلمه عبور بروزرسانی شد']);
+            }
+        }else{
+            return response()->json(['mes' => 'کلمه عبور اشتباه است']);
+        }
     }
 }

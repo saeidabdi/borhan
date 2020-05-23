@@ -14843,7 +14843,9 @@ var app = new Vue({
         teacher_name: '', teacher_pass: '', teacher_user: '', goto_class: '', teacher_id: '', teacher_class: [], all_teacher: [], search_item: '', teach_id: '',
         stu_name: '', stu_user: '', stu_pass: '', stu_id: '', stu_class: [], all_stu: [],
         film_name: '', film_addr: '', all_special_film: [], specail_ids: [], limit_times: [],
-        film_id: '', all_film: [], i: 1, status: 0, message: '', view_id: '', all_absent: []
+        film_id: '', all_film: [], i: 1, status: 0, message: '', view_id: '', all_absent: [],
+        new_pass: '', new_pass2: '',
+        stu_count: '', teacher_count: '', film_count: '', branch_count: ''
     },
     mounted: function mounted() {
         var a = this;
@@ -14863,9 +14865,25 @@ var app = new Vue({
     router: router,
     methods: {
         //******************* */ user
+        // index
+        get_index: function get_index() {
+            var _this = this;
+
+            this.isLoading = true;
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/user/get_index').then(function (response) {
+                _this.stu_count = response.data.stu;
+                _this.teacher_count = response.data.teacher;
+                _this.film_count = response.data.film;
+                _this.branch_count = response.data.branch;
+                _this.teacher_name = response.data.activest_teacher.name;
+                _this.stu_name = response.data.activest_student.name;
+                _this.isLoading = false;
+            });
+        },
+
         // branch
         admin_login: function admin_login() {
-            var _this = this;
+            var _this2 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/login', {
@@ -14873,7 +14891,7 @@ var app = new Vue({
                 pass: this.pass
 
             }).then(function (response) {
-                _this.isLoading = false;
+                _this2.isLoading = false;
                 if (response.data.username != undefined) {
                     __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'مدیر گرامی ' + response.data.name + ' شما وارد شدید', 'success');
                     location.href = "/user/index";
@@ -14881,39 +14899,42 @@ var app = new Vue({
                     __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'کاربر وجود ندارد', 'warning');
                 }
             }, function (response) {
-                _this.isLoading = false;
+                _this2.isLoading = false;
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'مشکل در اتصال به سرور', 'warning');
             });
         },
         getuser: function getuser() {
-            var _this2 = this;
+            var _this3 = this;
 
             // if (window.location.pathname != '/') {
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/user/getuser').then(function (response) {
                 if (response.data.username != undefined) {
                     if (window.location.pathname == '/user/branch' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report') {
-                        _this2.get_branch();
+                        _this3.get_branch();
                     }
                     if (window.location.pathname == '/user/paye' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report') {
-                        _this2.get_paye();
+                        _this3.get_paye();
                     }
                     if (window.location.pathname == '/user/reshte' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report') {
-                        _this2.get_reshte();
+                        _this3.get_reshte();
                     }
-                    _this2.logined = 1;
-                    _this2.user_id = response.data.id;
-                    _this2.type = response.data.type;
-                    _this2.username = response.data.username;
-                    _this2.name = response.data.name;
+                    if (window.location.pathname == '/user/index') {
+                        _this3.get_index();
+                    }
+                    _this3.logined = 1;
+                    _this3.user_id = response.data.id;
+                    _this3.type = response.data.type;
+                    _this3.username = response.data.username;
+                    _this3.name = response.data.name;
                 } else {
                     // location.href = '/';
-                    _this2.logined = '';
+                    _this3.logined = '';
                 }
             });
             // }
         },
         add_branch: function add_branch() {
-            var _this3 = this;
+            var _this4 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/add_branch', {
@@ -14922,27 +14943,27 @@ var app = new Vue({
                 type: this.branch_type,
                 id: this.branch_id
             }).then(function (response) {
-                _this3.isLoading = false;
-                _this3.get_branch();
+                _this4.isLoading = false;
+                _this4.get_branch();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, 'success');
             });
         },
         get_branch: function get_branch() {
-            var _this4 = this;
+            var _this5 = this;
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/user/get_branch').then(function (response) {
-                _this4.all_branch = response.data;
+                _this5.all_branch = response.data;
             });
         },
         delete_branch: function delete_branch(branch_id) {
-            var _this5 = this;
+            var _this6 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/delete_branch', {
                 id: branch_id
             }).then(function (response) {
-                _this5.isLoading = false;
-                _this5.get_branch();
+                _this6.isLoading = false;
+                _this6.get_branch();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'شعبه حذف شد', 'success');
             });
         },
@@ -14955,7 +14976,7 @@ var app = new Vue({
 
         // paye
         add_paye: function add_paye() {
-            var _this6 = this;
+            var _this7 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/add_paye', {
@@ -14963,27 +14984,27 @@ var app = new Vue({
                 type: this.branch_type,
                 id: this.paye_id
             }).then(function (response) {
-                _this6.isLoading = false;
-                _this6.get_paye();
+                _this7.isLoading = false;
+                _this7.get_paye();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, 'success');
             });
         },
         get_paye: function get_paye() {
-            var _this7 = this;
+            var _this8 = this;
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/user/get_paye').then(function (response) {
-                _this7.all_paye = response.data;
+                _this8.all_paye = response.data;
             });
         },
         delete_paye: function delete_paye(paye_id) {
-            var _this8 = this;
+            var _this9 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/delete_paye', {
                 id: paye_id
             }).then(function (response) {
-                _this8.isLoading = false;
-                _this8.get_paye();
+                _this9.isLoading = false;
+                _this9.get_paye();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'پایه حذف شد', 'success');
             });
         },
@@ -14995,34 +15016,34 @@ var app = new Vue({
 
         // reshte
         add_reshte: function add_reshte() {
-            var _this9 = this;
+            var _this10 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/add_reshte', {
                 title: this.reshte_name,
                 id: this.reshte_id
             }).then(function (response) {
-                _this9.isLoading = false;
-                _this9.get_reshte();
+                _this10.isLoading = false;
+                _this10.get_reshte();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, 'success');
             });
         },
         get_reshte: function get_reshte() {
-            var _this10 = this;
+            var _this11 = this;
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/user/get_reshte').then(function (response) {
-                _this10.all_reshte = response.data;
+                _this11.all_reshte = response.data;
             });
         },
         delete_reshte: function delete_reshte(reshte_id) {
-            var _this11 = this;
+            var _this12 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/delete_reshte', {
                 id: reshte_id
             }).then(function (response) {
-                _this11.isLoading = false;
-                _this11.get_reshte();
+                _this12.isLoading = false;
+                _this12.get_reshte();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'رشته حذف شد', 'success');
             });
         },
@@ -15033,7 +15054,7 @@ var app = new Vue({
 
         // dars
         add_lesson: function add_lesson() {
-            var _this12 = this;
+            var _this13 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/add_lesson', {
@@ -15043,8 +15064,8 @@ var app = new Vue({
                 reshte_id: this.reshte_id,
                 id: this.lesson_id
             }).then(function (response) {
-                _this12.isLoading = false;
-                _this12.get_lesson();
+                _this13.isLoading = false;
+                _this13.get_lesson();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, 'success');
             });
         },
@@ -15064,7 +15085,7 @@ var app = new Vue({
             }
         },
         get_lesson: function get_lesson() {
-            var _this13 = this;
+            var _this14 = this;
 
             var a = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -15078,12 +15099,12 @@ var app = new Vue({
                 paye_id: this.paye_id,
                 reshte_id: this.reshte_id
             }).then(function (response) {
-                _this13.isLoading = false;
-                _this13.all_lesson = response.data;
+                _this14.isLoading = false;
+                _this14.all_lesson = response.data;
             });
         },
         get_lesson_stu: function get_lesson_stu() {
-            var _this14 = this;
+            var _this15 = this;
 
             this.all_lesson = [];
             this.isLoading = true;
@@ -15091,19 +15112,19 @@ var app = new Vue({
                 paye_id: this.paye_id,
                 reshte_id: this.reshte_id
             }).then(function (response) {
-                _this14.isLoading = false;
-                _this14.all_lesson = response.data;
+                _this15.isLoading = false;
+                _this15.all_lesson = response.data;
             });
         },
         delete_lesson: function delete_lesson(lesson_id) {
-            var _this15 = this;
+            var _this16 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/delete_lesson', {
                 id: lesson_id
             }).then(function (response) {
-                _this15.isLoading = false;
-                _this15.get_lesson();
+                _this16.isLoading = false;
+                _this16.get_lesson();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'درس حذف شد', 'success');
             });
         },
@@ -15117,7 +15138,7 @@ var app = new Vue({
 
         // teacher
         add_teacher: function add_teacher() {
-            var _this16 = this;
+            var _this17 = this;
 
             if (this.teacher_name && this.teacher_pass && this.teacher_user) {
                 this.isLoading = true;
@@ -15127,22 +15148,22 @@ var app = new Vue({
                     pass: this.teacher_pass,
                     id: this.teacher_id
                 }).then(function (response) {
-                    _this16.isLoading = false;
+                    _this17.isLoading = false;
                     if (response.data.id) {
-                        _this16.teacher_id = response.data.id;
+                        _this17.teacher_id = response.data.id;
                     }
-                    _this16.reshte_id = '';
-                    _this16.branch_id = '';
-                    _this16.branch_type = 0;
-                    _this16.lesson_id = '';
-                    _this16.paye_id = '';
-                    _this16.teacher_class = [];
-                    _this16.get_teacher();
+                    _this17.reshte_id = '';
+                    _this17.branch_id = '';
+                    _this17.branch_type = 0;
+                    _this17.lesson_id = '';
+                    _this17.paye_id = '';
+                    _this17.teacher_class = [];
+                    _this17.get_teacher();
                     // Swal.fire('', response.data.mes, 'success')
                     // if (response.data.id) {
-                    _this16.goto_class = 1;
+                    _this17.goto_class = 1;
                     if (response.data.id == undefined) {
-                        _this16.get_teacher_class();
+                        _this17.get_teacher_class();
                     }
                 });
             } else {
@@ -15150,7 +15171,7 @@ var app = new Vue({
             }
         },
         give_class_toteacher: function give_class_toteacher() {
-            var _this17 = this;
+            var _this18 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/give_class_toteacher', {
@@ -15161,34 +15182,34 @@ var app = new Vue({
                 l_id: this.lesson_id,
                 id: ''
             }).then(function (response) {
-                _this17.isLoading = false;
-                _this17.get_teacher_class();
+                _this18.isLoading = false;
+                _this18.get_teacher_class();
                 // Swal.fire('', response.data.mes, 'success')
             });
         },
         get_teacher_class: function get_teacher_class() {
-            var _this18 = this;
+            var _this19 = this;
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/get_teacher_class', {
                 t_id: this.teacher_id
             }).then(function (response) {
-                _this18.teacher_class = response.data;
+                _this19.teacher_class = response.data;
             });
         },
         delete_teacher_class: function delete_teacher_class(class_teacher_id) {
-            var _this19 = this;
+            var _this20 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/delete_teacher_class', {
                 id: class_teacher_id
             }).then(function (response) {
-                _this19.isLoading = false;
-                _this19.get_teacher_class();
+                _this20.isLoading = false;
+                _this20.get_teacher_class();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'کلاس حذف شد', 'success');
             });
         },
         get_teacher: function get_teacher() {
-            var _this20 = this;
+            var _this21 = this;
 
             var a = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -15196,25 +15217,25 @@ var app = new Vue({
                 if (!this.all_teacher.length) {
                     this.isLoading = true;
                     __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/user/get_teacher').then(function (response) {
-                        _this20.isLoading = false;
-                        _this20.all_teacher = response.data;
+                        _this21.isLoading = false;
+                        _this21.all_teacher = response.data;
                     });
                 }
             } else {
                 __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/user/get_teacher').then(function (response) {
-                    _this20.all_teacher = response.data;
+                    _this21.all_teacher = response.data;
                 });
             }
         },
         delete_teacher: function delete_teacher(teacher_id) {
-            var _this21 = this;
+            var _this22 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/delete_teacher', {
                 id: teacher_id
             }).then(function (response) {
-                _this21.isLoading = false;
-                _this21.get_teacher();
+                _this22.isLoading = false;
+                _this22.get_teacher();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'معلم حذف شد', 'success');
             });
         },
@@ -15227,7 +15248,7 @@ var app = new Vue({
 
         // stu
         add_stu: function add_stu() {
-            var _this22 = this;
+            var _this23 = this;
 
             if (this.stu_name && this.stu_pass && this.stu_user && this.paye_id) {
                 this.isLoading = true;
@@ -15239,19 +15260,19 @@ var app = new Vue({
                     r_id: this.reshte_id,
                     id: this.stu_id
                 }).then(function (response) {
-                    _this22.isLoading = false;
-                    _this22.get_lesson_stu();
+                    _this23.isLoading = false;
+                    _this23.get_lesson_stu();
                     if (response.data.id) {
-                        _this22.stu_id = response.data.id;
+                        _this23.stu_id = response.data.id;
                     }
-                    _this22.branch_id = '';
-                    _this22.branch_type = 0;
-                    _this22.lesson_id = '';
-                    _this22.stu_class = [];
-                    _this22.get_stu();
-                    _this22.goto_class = 1;
+                    _this23.branch_id = '';
+                    _this23.branch_type = 0;
+                    _this23.lesson_id = '';
+                    _this23.stu_class = [];
+                    _this23.get_stu();
+                    _this23.goto_class = 1;
                     if (response.data.id == undefined) {
-                        _this22.get_stu_class();
+                        _this23.get_stu_class();
                     }
                 });
             } else {
@@ -15268,7 +15289,7 @@ var app = new Vue({
             }
         },
         give_class_tostu: function give_class_tostu() {
-            var _this23 = this;
+            var _this24 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/give_class_tostu', {
@@ -15276,36 +15297,36 @@ var app = new Vue({
                 b_id: this.branch_id,
                 l_id: this.lesson_id
             }).then(function (response) {
-                _this23.isLoading = false;
-                _this23.get_stu_class();
+                _this24.isLoading = false;
+                _this24.get_stu_class();
                 // Swal.fire('', response.data.mes, 'success')
             });
         },
         get_stu_class: function get_stu_class() {
-            var _this24 = this;
+            var _this25 = this;
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/get_stu_class', {
                 s_id: this.stu_id
             }).then(function (response) {
-                _this24.stu_class = response.data;
+                _this25.stu_class = response.data;
             });
         },
 
         // متد پایین همون حذف کلاس دانش آموزه که اسمش اشتباه شده
         stu_teacher_class: function stu_teacher_class(class_stu_id) {
-            var _this25 = this;
+            var _this26 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/stu_teacher_class', {
                 id: class_stu_id
             }).then(function (response) {
-                _this25.isLoading = false;
-                _this25.get_stu_class();
+                _this26.isLoading = false;
+                _this26.get_stu_class();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'کلاس دانش آموز حذف شد', 'success');
             });
         },
         get_stu: function get_stu() {
-            var _this26 = this;
+            var _this27 = this;
 
             var a = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
@@ -15313,25 +15334,25 @@ var app = new Vue({
                 if (!this.all_stu.length) {
                     this.isLoading = true;
                     __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/user/get_stu').then(function (response) {
-                        _this26.isLoading = false;
-                        _this26.all_stu = response.data;
+                        _this27.isLoading = false;
+                        _this27.all_stu = response.data;
                     });
                 }
             } else {
                 __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/user/get_stu').then(function (response) {
-                    _this26.all_stu = response.data;
+                    _this27.all_stu = response.data;
                 });
             }
         },
         delete_stu: function delete_stu(stu_id) {
-            var _this27 = this;
+            var _this28 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/delete_stu', {
                 id: stu_id
             }).then(function (response) {
-                _this27.isLoading = false;
-                _this27.get_stu();
+                _this28.isLoading = false;
+                _this28.get_stu();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'دانش آموز حذف شد', 'success');
             });
         },
@@ -15343,25 +15364,42 @@ var app = new Vue({
             this.paye_id = stu.p_id;
             this.reshte_id = stu.r_id;
         },
+        edit_active: function edit_active(stu) {
+            var _this29 = this;
+
+            var active;
+            stu.active == 1 ? active = 0 : active = 1;
+
+            this.isLoading = true;
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/edit_active', {
+                id: stu.id,
+                activ: active
+            }).then(function (response) {
+                _this29.isLoading = false;
+                _this29.get_stu();
+                active == 1 ? __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'وضعیت فعال شد', 'success') : __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'وضعیت غیر فعال شد', 'success');
+            });
+        },
 
         // film
         change_lesson: function change_lesson() {
-            var _this28 = this;
+            var _this30 = this;
 
             this.all_teacher = [];
+            this.all_film = [];
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/change_lesson', {
                 l_id: this.lesson_id
             }).then(function (response) {
-                _this28.isLoading = false;
-                _this28.all_teacher = response.data;
+                _this30.isLoading = false;
+                _this30.all_teacher = response.data;
             });
         },
         funcaddrfilm: function funcaddrfilm(val) {
             this.film_addr = val;
         },
         add_film: function add_film() {
-            var _this29 = this;
+            var _this31 = this;
 
             if (this.film_name && this.film_addr && this.lesson_id && this.teacher_id) {
                 this.isLoading = true;
@@ -15372,12 +15410,12 @@ var app = new Vue({
                     t_id: this.teacher_id,
                     id: ''
                 }).then(function (response) {
-                    _this29.isLoading = false;
-                    _this29.goto_class = 1;
-                    _this29.film_id = response.data.id;
+                    _this31.isLoading = false;
+                    _this31.goto_class = 1;
+                    _this31.film_id = response.data.id;
                     // this.get_ids_spcial_film( response.data.id);
-                    _this29.get_film();
-                    _this29.all_special_film = response.data.special_film;
+                    _this31.get_film();
+                    _this31.all_special_film = response.data.special_film;
                     __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, 'success');
                 });
             } else {
@@ -15385,7 +15423,7 @@ var app = new Vue({
             }
         },
         allow_show: function allow_show(b_id, s_id) {
-            var _this30 = this;
+            var _this32 = this;
 
             if (this.limit_times[s_id]) {
                 this.isLoading = true;
@@ -15396,34 +15434,34 @@ var app = new Vue({
                     limit_time: this.limit_times[s_id]
                 }).then(function (response) {
                     __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, 'success');
-                    _this30.specail_ids.push(s_id);
-                    _this30.isLoading = false;
+                    _this32.specail_ids.push(s_id);
+                    _this32.isLoading = false;
                 });
             } else {
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'لطفا تمام فیلد ها را پر کنید', 'error');
             }
         },
         get_film: function get_film() {
-            var _this31 = this;
+            var _this33 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/get_film', {
                 l_id: this.lesson_id,
                 t_id: this.teacher_id
             }).then(function (response) {
-                _this31.isLoading = false;
-                _this31.all_film = response.data;
+                _this33.isLoading = false;
+                _this33.all_film = response.data;
             });
         },
         delete_film: function delete_film(film_id) {
-            var _this32 = this;
+            var _this34 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/delete_film', {
                 id: film_id
             }).then(function (response) {
-                _this32.isLoading = false;
-                _this32.get_film();
+                _this34.isLoading = false;
+                _this34.get_film();
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'فیلم حذف شد', 'success');
             });
         },
@@ -15433,7 +15471,7 @@ var app = new Vue({
             this.film_addr = film.addr;
         },
         edit_filmfunc: function edit_filmfunc() {
-            var _this33 = this;
+            var _this35 = this;
 
             if (this.film_name) {
                 this.specail_ids = [];
@@ -15445,27 +15483,27 @@ var app = new Vue({
                     l_id: this.lesson_id,
                     t_id: this.teacher_id
                 }).then(function (response) {
-                    _this33.isLoading = false;
-                    _this33.goto_class = 1;
+                    _this35.isLoading = false;
+                    _this35.goto_class = 1;
                     for (var i = 0; i < response.data.film_branch_ids.length; i++) {
-                        _this33.specail_ids.push(response.data.film_branch_ids[i].tm_id);
-                        _this33.limit_times[response.data.film_branch_ids[i].tm_id] = response.data.film_branch_ids[i].limit_time;
+                        _this35.specail_ids.push(response.data.film_branch_ids[i].tm_id);
+                        _this35.limit_times[response.data.film_branch_ids[i].tm_id] = response.data.film_branch_ids[i].limit_time;
                     }
 
                     // this.get_ids_spcial_film( response.data.id);
-                    _this33.get_film();
-                    _this33.all_special_film = response.data.special_film;
+                    _this35.get_film();
+                    _this35.all_special_film = response.data.special_film;
                 });
             } else {
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'لطفا تمام فیلد ها را پر کنید', 'error');
             }
         },
         exit_user: function exit_user() {
-            var _this34 = this;
+            var _this36 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/user/exit_user').then(function (response) {
-                _this34.isLoading = false;
+                _this36.isLoading = false;
                 location.href = "/";
             }, function (response) {
                 swal('خارج نشد');
@@ -15474,16 +15512,35 @@ var app = new Vue({
 
         // report
         report_absent: function report_absent() {
-            var _this35 = this;
+            var _this37 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/report_absent', {
                 film_id: this.film_id,
                 b_id: this.branch_id
             }).then(function (response) {
-                _this35.isLoading = false;
-                _this35.all_absent = response.data;
+                _this37.isLoading = false;
+                _this37.all_absent = response.data;
             });
+        },
+
+        // pass
+        edit_pass_user: function edit_pass_user() {
+            var _this38 = this;
+
+            if (this.pass && this.new_pass && this.new_pass2 && this.new_pass == this.new_pass2) {
+                this.isLoading = true;
+                __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/edit_pass', {
+                    stu_id: this.user_id,
+                    pass: this.pass,
+                    new_pass: this.new_pass
+                }).then(function (response) {
+                    _this38.isLoading = false;
+                    __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, '');
+                });
+            } else {
+                __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'کلمه عبور با تکرارش مطابقیت ندارد', 'warning');
+            }
         },
 
         // *********************** student
@@ -15497,7 +15554,7 @@ var app = new Vue({
             }
         },
         stu_login: function stu_login() {
-            var _this36 = this;
+            var _this39 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/stu/login', {
@@ -15505,7 +15562,7 @@ var app = new Vue({
                 pass: this.pass
 
             }).then(function (response) {
-                _this36.isLoading = false;
+                _this39.isLoading = false;
                 if (response.data.username != undefined) {
                     if (response.data.active == 1) {
                         if (getCookie('user')) {
@@ -15527,31 +15584,34 @@ var app = new Vue({
                     __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'کاربر وجود ندارد', 'warning');
                 }
             }, function (response) {
-                _this36.isLoading = false;
+                _this39.isLoading = false;
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'مشکل در اتصال به سرور', 'warning');
             });
         },
         getstu: function getstu() {
-            var _this37 = this;
+            var _this40 = this;
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/stu/getstu').then(function (response) {
                 if (response.data.username != undefined) {
                     if (window.location.pathname == '/stu/index') {
-                        _this37.get_branch_stu(response.data.id, response.data.p_id, response.data.r_id);
+                        _this40.get_branch_stu(response.data.id, response.data.p_id, response.data.r_id);
                     }
-                    _this37.logined = 1;
-                    _this37.stu_id = response.data.id;
-                    _this37.paye_id = response.data.p_id;
-                    _this37.reshte_id = response.data.r_id;
-                    _this37.username = response.data.username;
-                    _this37.name = response.data.name;
+                    if (window.location.pathname == '/stu/profile') {
+                        _this40.get_profile_stu(response.data.id);
+                    }
+                    _this40.logined = 1;
+                    _this40.stu_id = response.data.id;
+                    _this40.paye_id = response.data.p_id;
+                    _this40.reshte_id = response.data.r_id;
+                    _this40.username = response.data.username;
+                    _this40.name = response.data.name;
                 } else {
-                    _this37.logined = '';
+                    _this40.logined = '';
                 }
             });
         },
         get_branch_stu: function get_branch_stu(stu_id, p_id, r_id) {
-            var _this38 = this;
+            var _this41 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/stu/get_branch_stu', {
@@ -15559,17 +15619,17 @@ var app = new Vue({
                 p_id: p_id,
                 r_id: r_id
             }).then(function (response) {
-                _this38.isLoading = false;
-                _this38.status = response.data.status;
+                _this41.isLoading = false;
+                _this41.status = response.data.status;
                 if (response.data.status == 0) {
-                    _this38.all_branch = response.data.branch;
+                    _this41.all_branch = response.data.branch;
                 } else {
-                    _this38.all_lesson = response.data.lesson;
+                    _this41.all_lesson = response.data.lesson;
                 }
             });
         },
         show_dars: function show_dars(b_id, type) {
-            var _this39 = this;
+            var _this42 = this;
 
             this.branch_id = b_id;
             this.isLoading = true;
@@ -15580,14 +15640,14 @@ var app = new Vue({
                 p_id: this.paye_id,
                 r_id: this.reshte_id
             }).then(function (response) {
-                _this39.isLoading = false;
-                _this39.status = 1;
-                _this39.$router.push('/stu/lesson');
-                _this39.all_lesson = response.data.lesson;
+                _this42.isLoading = false;
+                _this42.status = 1;
+                _this42.$router.push('/stu/lesson');
+                _this42.all_lesson = response.data.lesson;
             });
         },
         show_film: function show_film(lesson_id) {
-            var _this40 = this;
+            var _this43 = this;
 
             this.message = '';
             this.isLoading = true;
@@ -15597,20 +15657,20 @@ var app = new Vue({
                 p_id: this.paye_id,
                 r_id: this.reshte_id
             }).then(function (response) {
-                _this40.isLoading = false;
-                _this40.status = 2;
-                _this40.$router.push('/stu/film');
+                _this43.isLoading = false;
+                _this43.status = 2;
+                _this43.$router.push('/stu/film');
 
                 if (response.data.film != 0) {
                     console.log(response.data.film);
-                    _this40.all_film = response.data.film;
+                    _this43.all_film = response.data.film;
                 } else {
-                    _this40.message = 'هیچ فیلمی موجود نمیباشد';
+                    _this43.message = 'هیچ فیلمی موجود نمیباشد';
                 }
             });
         },
         play_film: function play_film(film_id) {
-            var _this41 = this;
+            var _this44 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/stu/play_film', {
@@ -15618,17 +15678,52 @@ var app = new Vue({
                 stu_id: this.stu_id,
                 b_id: this.branch_id
             }).then(function (response) {
-                _this41.isLoading = false;
-                _this41.status = 3;
-                _this41.$router.push('/stu/play_film');
-                _this41.film_addr = response.data.film.addr;
-                _this41.view_id = response.data.view_id;
+                _this44.isLoading = false;
+                _this44.status = 3;
+                _this44.$router.push('/stu/play_film');
+                _this44.film_addr = response.data.film.addr;
+                _this44.view_id = response.data.view_id;
             });
         },
         onEnd: function onEnd() {
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/stu/onEnd', {
                 view_id: this.view_id
             });
+        },
+
+        // profile
+        get_profile_stu: function get_profile_stu(id) {
+            var _this45 = this;
+
+            this.isLoading = true;
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/stu/get_profile_stu', {
+                id: id
+            }).then(function (response) {
+                _this45.name = response.data[0].name;
+                _this45.username = response.data[0].username;
+                _this45.paye_name = response.data[0].p_title;
+                _this45.reshte_name = response.data[0].r_title;
+                _this45.isLoading = false;
+            });
+        },
+
+        // pass
+        edit_pass: function edit_pass() {
+            var _this46 = this;
+
+            if (this.pass && this.new_pass && this.new_pass2 && this.new_pass == this.new_pass2) {
+                this.isLoading = true;
+                __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/stu/edit_pass', {
+                    stu_id: this.stu_id,
+                    pass: this.pass,
+                    new_pass: this.new_pass
+                }).then(function (response) {
+                    _this46.isLoading = false;
+                    __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, '');
+                });
+            } else {
+                __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'کلمه عبور با تکرارش مطابقیت ندارد', 'warning');
+            }
         }
     }
 });

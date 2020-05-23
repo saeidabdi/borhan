@@ -88,6 +88,12 @@
                         </ul>
                     </li>
                     <li class="active">
+                        <a href="/user/pass">
+                            <span style="margin-left: 5px" class="fas fa-key mr-3"></span>
+                            تغیر کلمه عبور
+                        </a>
+                    </li>
+                    <li class="active">
                         <a @click="exit_user()">
                             <span style="margin-left: 5px" class="fas fa-sign-out-alt mr-3"></span>
                             خروج

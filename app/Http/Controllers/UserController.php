@@ -14,6 +14,7 @@ use App\Stu;
 use App\StuManagement;
 use App\Teacher;
 use App\TeacherManage;
+use App\views_film;
 use DB;
 use Verta;
 use Session;
@@ -549,8 +550,9 @@ class UserController extends Controller
 
                 $n = Verta::createTimestamp((int) $absent[$key]->close_time);
                 $absent[$key]->close_time = $n->formatDatetime();
-            }else{
-                $absent[$key]->extra='';    $absent[$key]->close_time = '';
+            } else {
+                $absent[$key]->extra = '';
+                $absent[$key]->close_time = '';
             }
 
 
@@ -559,5 +561,78 @@ class UserController extends Controller
         }
 
         return $absent;
+    }
+
+    public function edit_active(Request $request)
+    {
+
+        $stu = Stu::where('id', $request->id)->update([
+            'active' => $request->activ
+        ]);
+
+        return $stu;
+    }
+    public function pass()
+    {
+        return view('user.pass');
+    }
+
+    public function edit_pass(Request $request)
+    {
+        $stu = User::where('id', $request->stu_id)
+            ->where('pass', $request->pass)
+            ->first();
+
+        if ($stu) {
+            $stu->pass = $request->new_pass;
+            if ($stu->update()) {
+                return response()->json(['mes' => 'کلمه عبور بروزرسانی شد']);
+            }
+        } else {
+            return response()->json(['mes' => 'کلمه عبور اشتباه است']);
+        }
+    }
+
+
+
+    public function get_index()
+    {
+        $stu = Stu::count();
+        $film = Film::count();
+        $branch = Branch::count();
+        $teacher = Teacher::count();
+
+        // activest_teacher
+        $activest_teacher = DB::table('film')
+        ->groupBy('t_id')->select('t_id', DB::raw('count(*) as total'))->get();
+
+        $max = -9999999; //will hold max val
+        $found_item = []; //will hold item with max val;
+
+        foreach ($activest_teacher as $k => $v) {
+            if ($v->total > $max) {
+                $max = $v->total;
+                $found_item = $v;
+            }
+        }
+
+        $activest_teacher = Teacher::find($found_item->t_id);
+
+        // activest_student
+        $lasttime = time() - 7 * 86400;
+        $activest_student = views_film::where('open_time','>',$lasttime)->groupBy('stu_id')->select('stu_id', DB::raw('count(*) as total'))->get();
+
+        $max2 = -9999999; //will hold max val
+        $found_item2 = []; //will hold item with max val;
+
+        foreach ($activest_student as $k => $v) {
+            if ($v->total > $max2) {
+                $max2 = $v->total;
+                $found_item2 = $v;
+            }
+        }
+        $activest_student = Stu::find($found_item2->stu_id);
+
+        return response()->json(['stu' => $stu, 'film' => $film, 'branch' => $branch, 'teacher' => $teacher, 'activest_teacher' => $activest_teacher,'activest_student'=>$activest_student]);
     }
 }

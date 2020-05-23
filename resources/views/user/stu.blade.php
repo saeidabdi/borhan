@@ -53,7 +53,7 @@
                     <button style="margin-top: 42px;" type="button" class="btn btn_borhan" @click="add_stu()">ایجاد دانش آموز</button>
                 </div>
             </div>
-            <!-- انتخاب کلاس های معلم -->
+            <!-- انتخاب کلاس های دانش آموز -->
             <div v-if="goto_class">
                 <h4>برنامه ی کلاسی @{{stu_name}}</h4>
                 <div class="col-md-3 right" style="padding-top: 10px;">
@@ -75,7 +75,7 @@
                 <button v-if="with_reshte" style="margin-top: 42px;" type="button" class="btn btn-success" @click="give_class_tostu()">اختصصاص درس به دانش آموز</button>
                 <button v-if="!with_reshte" style="margin-top: 42px;" type="button" class="btn btn-success" @click="give_class_tostu()">اختصاص همه ی دروس</button>
                 <button style="margin-top: 42px;" type="button" class="btn btn_borhan" @click="()=>{goto_class='',stu_id=''}">اتمام</button>
-                <!-- جدول نماش کلاس ها معلم -->
+                <!-- جدول نماش کلاس ها دانش آموز -->
                 <table v-if="stu_class.length" class="table table-striped table-bordered table-hover table-condensed">
                     <thead>
                         <th>ردیف</th>
@@ -110,6 +110,7 @@
                     <th>نام</th>
                     <th>نام کاربری</th>
                     <th>کلمه عبور</th>
+                    <th>وضعیت</th>
                     <th>ویرایش</th>
                     <th>حذف</th>
                 </thead>
@@ -119,6 +120,8 @@
                         <td>@{{stu.name}}</td>
                         <td>@{{stu.username}}</td>
                         <td>@{{stu.pass}}</td>
+                        <td title="فعال کردن" @click="edit_active(stu)" v-if="stu.active == 0">غیر فعال</td>
+                        <td title="غیر فعال کردن" @click="edit_active(stu)" v-if="stu.active == 1">فعال</td>
                         <td class="td_edit" @click="stu_edit(stu)"><i class="fa fa-edit"></i></td>
                         <td class="td_delete" @click="delete_stu(stu.id)"><i class="fa fa-trash"></i></td>
                     </tr>
@@ -127,6 +130,8 @@
                         <td>@{{stu.name}}</td>
                         <td>@{{stu.username}}</td>
                         <td>@{{stu.pass}}</td>
+                        <td title="فعال کردن" @click="edit_active(stu)" v-if="stu.active == 0">غیر فعال</td>
+                        <td title="غیر فعال کردن" @click="edit_active(stu)" v-if="stu.active == 1">فعال</td>
                         <td class="td_edit" @click="stu_edit(stu)"><i class="fa fa-edit"></i></td>
                         <td class="td_delete" @click="delete_stu(stu.id)"><i class="fa fa-trash"></i></td>
                     </tr>

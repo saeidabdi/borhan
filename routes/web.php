@@ -58,6 +58,10 @@ Route::group(['prefix' => 'user'], function () {
     Route::get('/exit_user', 'UserController@exit_user');
     Route::get('/report', 'UserController@report');
     Route::post('/report_absent', 'UserController@report_absent');
+    Route::post('/edit_active', 'UserController@edit_active');
+    Route::get('/pass', 'UserController@pass');
+    Route::post('/edit_pass', 'UserController@edit_pass');
+    Route::get('/get_index', 'UserController@get_index');
 });
 Route::post('formSubmit', 'UserController@formSubmit');
 // ********** student
@@ -74,4 +78,7 @@ Route::group(['prefix' => 'stu'], function () {
     Route::get('/play_film', 'StuController@play_a_film');
     Route::post('/onEnd', 'StuController@onEnd');
     Route::get('/profile', 'StuController@profile');
+    Route::post('/get_profile_stu', 'StuController@get_profile_stu');
+    Route::get('/pass', 'StuController@pass');
+    Route::post('/edit_pass', 'StuController@edit_pass');
 });

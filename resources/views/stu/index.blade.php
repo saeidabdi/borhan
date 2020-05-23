@@ -21,7 +21,7 @@
         </div>
     </div>
     <div v-if="status == 2">
-        <div v-if="!message" v-for="film in all_film" class="col-md-3 right">
+        <div v-if="!message && film.time_added > (new Date().getTime()/1000 - film.limit_time*3600)" v-for="film in all_film" class="col-md-3 right">
             <!-- v-if="film.time_added > (new Date().getTime()/1000 - film.limit_time*3600)" -->
             <div class="branch_item" @click="play_film(film.film_id)">
                 <img src="/as/images/film.png" alt="">
