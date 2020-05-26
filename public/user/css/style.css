@@ -8522,3 +8522,6 @@ video::-webkit-media-controls-fullscreen-button {
 .table{
   overflow: scroll;
 }
+.fullscreenButton {
+  display: none!important;
+}

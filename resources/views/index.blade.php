@@ -34,7 +34,7 @@
                         دانش آموز
                         <i class="fas fa-graduation-cap"></i>
                     </button>
-                    <button class="btn_login btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0 col-md-3" type="submit" @click="login()">
+                    <button class="btn_login btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0 col-md-3" type="submit" @click="teach_login()">
                         معلم
                         <i class="fas fa-chalkboard-teacher"></i>
                     </button>

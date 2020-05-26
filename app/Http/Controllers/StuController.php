@@ -103,6 +103,7 @@ class StuController extends Controller
                 ->where('film.l_id', $request->l_id)
                 ->where('film.t_id', $teacher->t_id)
                 ->leftJoin('film_branch', 'film.id', '=', 'film_branch.film_id')
+                ->where('film_branch.b_id', $teacher->b_id)
                 // ->select('lesson.*')
                 ->get();
         } else {

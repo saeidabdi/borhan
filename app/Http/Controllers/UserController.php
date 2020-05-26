@@ -494,7 +494,9 @@ class UserController extends Controller
 
     public function delete_film(Request $request)
     {
+        $film = Film::where('id', $request->id)->first();
         if (Film::where('id', $request->id)->delete()) {
+            unlink(public_path() .  '/images/' . $film->addr);
             return response()->json(['success' => 'فیلم با موفقیت حذف شد']);
         }
     }

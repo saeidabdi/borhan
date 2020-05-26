@@ -14849,6 +14849,13 @@ var app = new Vue({
     },
     mounted: function mounted() {
         var a = this;
+        // if (window.innerWidth > 960) {
+        //     $('#sidebar').css('margin-right', '0!important')
+        //     this.i = 0;
+        // }else{
+        //     $('#sidebar').css('margin-right', '-300px!important')
+        //     this.i = 1;
+        // }
         window.addEventListener('popstate', function (e) {
             a.status = a.status - 1;
         });
@@ -14856,6 +14863,8 @@ var app = new Vue({
             this.getuser();
         } else if (window.location.pathname.split('/')[1] == 'stu') {
             this.getstu();
+        } else if (window.location.pathname.split('/')[1] == 'teacher') {
+            this.getteach();
         }
     },
 
@@ -15080,6 +15089,9 @@ var app = new Vue({
                     this.all_paye[i].type == 1 ? this.with_reshte = 1 : this.with_reshte = '';
                     if (a == 1) {
                         this.get_lesson();
+                    }
+                    if (a == 2) {
+                        this.get_lesson_teacher();
                     }
                 }
             }
@@ -15719,6 +15731,136 @@ var app = new Vue({
                     new_pass: this.new_pass
                 }).then(function (response) {
                     _this46.isLoading = false;
+                    __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, '');
+                });
+            } else {
+                __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'کلمه عبور با تکرارش مطابقیت ندارد', 'warning');
+            }
+        },
+
+        // **************************** teach
+        teach_login: function teach_login() {
+            var _this47 = this;
+
+            this.isLoading = true;
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/teacher/login', {
+                username: this.username,
+                pass: this.pass
+
+            }).then(function (response) {
+                _this47.isLoading = false;
+                if (response.data.username != undefined) {
+                    __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', ' استاد گرامی ' + response.data.name + ' شما وارد شدید', 'success');
+                    location.href = "/teacher/index";
+                } else {
+                    __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'کاربر وجود ندارد', 'warning');
+                }
+            }, function (response) {
+                _this47.isLoading = false;
+                __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'مشکل در اتصال به سرور', 'warning');
+            });
+        },
+        getteach: function getteach() {
+            var _this48 = this;
+
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/teacher/getteach').then(function (response) {
+                if (response.data.username != undefined) {
+                    _this48.teacher_id = response.data.id;
+                    if (window.location.pathname == '/teacher/index') {
+                        _this48.get_paye_teacher(response.data.id);
+                    }
+                    if (window.location.pathname == '/teacher/dars') {
+                        _this48.get_branch_teacher(response.data.id);
+                    }
+                    if (window.location.pathname == '/teacher/plan') {
+                        _this48.get_teacher_class();
+                    }
+                    _this48.logined = 1;
+                    _this48.username = response.data.username;
+                    _this48.name = response.data.name;
+                } else {
+                    _this48.logined = '';
+                }
+            });
+        },
+        get_paye_teacher: function get_paye_teacher(teacher_id) {
+            var _this49 = this;
+
+            var b = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+            if (b == 0) {
+                this.isLoading = true;
+                __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/teacher/get_paye_teacher', {
+                    id: teacher_id
+                }).then(function (response) {
+                    _this49.isLoading = false;
+                    _this49.all_paye = response.data;
+                });
+            } else {
+                this.isLoading = true;
+                __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/teacher/get_paye_teacher', {
+                    id: teacher_id,
+                    branch_id: this.branch_id
+                }).then(function (response) {
+                    _this49.isLoading = false;
+                    _this49.all_paye = response.data;
+                });
+            }
+        },
+        get_lesson_teacher: function get_lesson_teacher() {
+            var _this50 = this;
+
+            this.all_lesson = [];
+            this.isLoading = true;
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/teacher/get_lesson_teacher', {
+                id: this.teacher_id,
+                paye_id: this.paye_id,
+                reshte_id: this.reshte_id
+            }).then(function (response) {
+                _this50.isLoading = false;
+                _this50.all_lesson = response.data;
+            });
+        },
+        get_reshte_teacher: function get_reshte_teacher() {
+            var _this51 = this;
+
+            this.isLoading = true;
+            if (this.branch_type == 1) {
+                __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/teacher/get_reshte_teacher', {
+                    id: this.teacher_id,
+                    paye_id: this.paye_id
+                }).then(function (response) {
+                    _this51.all_reshte = response.data;
+                });
+            } else {
+                this.reshte_id = '';
+            }
+            this.isLoading = false;
+            this.get_lesson_teacher();
+        },
+        get_branch_teacher: function get_branch_teacher(id) {
+            var _this52 = this;
+
+            this.isLoading = true;
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/teacher/get_branch_teacher', {
+                id: id
+            }).then(function (response) {
+                _this52.isLoading = false;
+                _this52.all_branch = response.data;
+            });
+            this.get_lesson_teacher();
+        },
+        edit_pass_teacher: function edit_pass_teacher() {
+            var _this53 = this;
+
+            if (this.pass && this.new_pass && this.new_pass2 && this.new_pass == this.new_pass2) {
+                this.isLoading = true;
+                __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/teacher/edit_pass_teacher', {
+                    stu_id: this.teacher_id,
+                    pass: this.pass,
+                    new_pass: this.new_pass
+                }).then(function (response) {
+                    _this53.isLoading = false;
                     __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, '');
                 });
             } else {

@@ -82,3 +82,18 @@ Route::group(['prefix' => 'stu'], function () {
     Route::get('/pass', 'StuController@pass');
     Route::post('/edit_pass', 'StuController@edit_pass');
 });
+// ********** student
+Route::group(['prefix' => 'teacher'], function () {
+    Route::post('/login', 'TeacherController@login');
+    Route::get('/index', 'TeacherController@index');
+    Route::get('/getteach', 'TeacherController@getteach');
+    Route::post('/get_paye_teacher', 'TeacherController@get_paye_teacher');
+    Route::post('/get_lesson_teacher', 'TeacherController@get_lesson_teacher');
+    Route::post('/get_reshte_teacher', 'TeacherController@get_reshte_teacher');
+    Route::get('/profile', 'TeacherController@profile');
+    Route::get('/dars', 'TeacherController@dars');
+    Route::post('/get_branch_teacher', 'TeacherController@get_branch_teacher');
+    Route::get('/pass', 'TeacherController@pass');
+    Route::post('/edit_pass_teacher', 'TeacherController@edit_pass_teacher');
+    Route::get('/plan', 'TeacherController@plan');
+});

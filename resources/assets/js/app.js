@@ -45,10 +45,17 @@ const app = new Vue({
         film_name: '', film_addr: '', all_special_film: [], specail_ids: [], limit_times: [],
         film_id: '', all_film: [], i: 1, status: 0, message: '', view_id: '', all_absent: [],
         new_pass: '', new_pass2: '',
-        stu_count:'',teacher_count:'',film_count:'',branch_count:'',
+        stu_count: '', teacher_count: '', film_count: '', branch_count: '',
     },
     mounted() {
         var a = this;
+        // if (window.innerWidth > 960) {
+        //     $('#sidebar').css('margin-right', '0!important')
+        //     this.i = 0;
+        // }else{
+        //     $('#sidebar').css('margin-right', '-300px!important')
+        //     this.i = 1;
+        // }
         window.addEventListener('popstate', (e) => {
             a.status = a.status - 1;
         })
@@ -56,6 +63,8 @@ const app = new Vue({
             this.getuser();
         } else if (window.location.pathname.split('/')[1] == 'stu') {
             this.getstu();
+        } else if (window.location.pathname.split('/')[1] == 'teacher') {
+            this.getteach();
         }
     },
     components: {
@@ -65,11 +74,11 @@ const app = new Vue({
     methods: {
         //******************* */ user
         // index
-        get_index(){
+        get_index() {
             this.isLoading = true
             axios
                 .get('/user/get_index')
-                .then(response=>{
+                .then(response => {
                     this.stu_count = response.data.stu;
                     this.teacher_count = response.data.teacher;
                     this.film_count = response.data.film;
@@ -116,7 +125,7 @@ const app = new Vue({
                     if (window.location.pathname == '/user/reshte' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report') {
                         this.get_reshte();
                     }
-                    if(window.location.pathname == '/user/index'){
+                    if (window.location.pathname == '/user/index') {
                         this.get_index();
                     }
                     this.logined = 1;
@@ -266,6 +275,9 @@ const app = new Vue({
                     this.all_paye[i].type == 1 ? this.with_reshte = 1 : this.with_reshte = '';
                     if (a == 1) {
                         this.get_lesson();
+                    }
+                    if (a == 2) {
+                        this.get_lesson_teacher();
                     }
                 }
             }
@@ -540,16 +552,16 @@ const app = new Vue({
         },
         edit_active(stu) {
             var active;
-            stu.active==1 ? active = 0 : active = 1;
+            stu.active == 1 ? active = 0 : active = 1;
 
             this.isLoading = true
             axios
                 .post('/user/edit_active', {
                     id: stu.id,
-                    activ : active
+                    activ: active
                 }).then(response => {
                     this.isLoading = false
-                    this.get_stu();    
+                    this.get_stu();
                     active == 1 ?
                         Swal.fire('', 'وضعیت فعال شد', 'success')
                         :
@@ -694,7 +706,7 @@ const app = new Vue({
                 })
         },
         // pass
-        edit_pass_user(){
+        edit_pass_user() {
             if ((this.pass && this.new_pass && this.new_pass2) && this.new_pass == this.new_pass2) {
                 this.isLoading = true
                 axios
@@ -886,7 +898,134 @@ const app = new Vue({
             } else {
                 Swal.fire('', 'کلمه عبور با تکرارش مطابقیت ندارد', 'warning');
             }
-        }
+        },
+        // **************************** teach
+        teach_login() {
+            this.isLoading = true;
+            axios
+                .post('/teacher/login', {
+                    username: this.username,
+                    pass: this.pass
+
+                }).then(response => {
+                    this.isLoading = false;
+                    if (response.data.username != undefined) {
+                        Swal.fire('', ' استاد گرامی ' + response.data.name + ' شما وارد شدید', 'success');
+                        location.href = "/teacher/index";
+                    } else {
+                        Swal.fire('', 'کاربر وجود ندارد', 'warning');
+
+                    }
+
+                }, response => {
+                    this.isLoading = false;
+                    Swal.fire('', 'مشکل در اتصال به سرور', 'warning');
+                });
+        },
+        getteach() {
+            axios
+                .get('/teacher/getteach')
+                .then(response => {
+                    if (response.data.username != undefined) {
+                        this.teacher_id = response.data.id
+                        if (window.location.pathname == '/teacher/index') {
+                            this.get_paye_teacher(response.data.id);
+                        }
+                        if (window.location.pathname == '/teacher/dars') {
+                            this.get_branch_teacher(response.data.id);
+                        }
+                        if (window.location.pathname == '/teacher/plan') {
+                            this.get_teacher_class();
+                        }
+                        this.logined = 1;
+                        this.username = response.data.username
+                        this.name = response.data.name
+                    } else {
+                        this.logined = '';
+                    }
+                });
+        },
+        get_paye_teacher(teacher_id, b = 0) {
+            if (b == 0) {
+                this.isLoading = true
+                axios
+                    .post('/teacher/get_paye_teacher', {
+                        id: teacher_id
+                    })
+                    .then(response => {
+                        this.isLoading = false
+                        this.all_paye = response.data;
+                    })
+            } else {
+                this.isLoading = true
+                axios
+                    .post('/teacher/get_paye_teacher', {
+                        id: teacher_id,
+                        branch_id: this.branch_id,
+                    })
+                    .then(response => {
+                        this.isLoading = false
+                        this.all_paye = response.data;
+                    })
+            }
+
+        },
+        get_lesson_teacher() {
+            this.all_lesson = [];
+            this.isLoading = true
+            axios
+                .post('/teacher/get_lesson_teacher', {
+                    id: this.teacher_id,
+                    paye_id: this.paye_id,
+                    reshte_id: this.reshte_id,
+                }).then(response => {
+                    this.isLoading = false
+                    this.all_lesson = response.data;
+                })
+        },
+        get_reshte_teacher() {
+            this.isLoading = true;
+            if (this.branch_type == 1) {
+                axios
+                    .post('/teacher/get_reshte_teacher', {
+                        id: this.teacher_id,
+                        paye_id: this.paye_id,
+                    }).then(response => {
+                        this.all_reshte = response.data;
+                    })
+            } else {
+                this.reshte_id = '';
+            }
+            this.isLoading = false
+            this.get_lesson_teacher();
+        },
+        get_branch_teacher(id) {
+            this.isLoading = true;
+            axios
+                .post('/teacher/get_branch_teacher', {
+                    id: id,
+                }).then(response => {
+                    this.isLoading = false
+                    this.all_branch = response.data;
+                })
+            this.get_lesson_teacher();
+        },
+        edit_pass_teacher() {
+            if ((this.pass && this.new_pass && this.new_pass2) && this.new_pass == this.new_pass2) {
+                this.isLoading = true
+                axios
+                    .post('/teacher/edit_pass_teacher', {
+                        stu_id: this.teacher_id,
+                        pass: this.pass,
+                        new_pass: this.new_pass,
+                    }).then(response => {
+                        this.isLoading = false
+                        Swal.fire('', response.data.mes, '');
+                    })
+            } else {
+                Swal.fire('', 'کلمه عبور با تکرارش مطابقیت ندارد', 'warning');
+            }
+        },
     },
 });
 function getCookie(name) {
