@@ -21,7 +21,8 @@
         </div>
     </div>
     <div v-if="status == 2">
-        <div v-if="!message && film.time_added > (new Date().getTime()/1000 - film.limit_time*3600)" v-for="film in all_film" class="col-md-3 right">
+        <div v-if="!message" v-for="film in all_film" class="col-md-3 right">
+            <!--  && film.time_added > (new Date().getTime()/1000 - film.limit_time*3600) -->
             <div class="branch_item" @click="play_film(film.film_id)">
                 <img src="/as/images/film.png" alt="">
                 <h3 v-if="film.film_id" class="h3_branch">@{{film.title}}</h3>
@@ -34,18 +35,15 @@
     <div v-if="status == 3">
         <div class="col-md-12 right p_video">
 
-            <!-- <div class="branch_item"> -->
-                <video oncontextmenu="return false;" id="myVideo" controlsList="nodownload" controls autoplay @ended="onEnd()">
-                    <source :src="'/images/'+film_addr" type="video/mp4">
-                    <!-- <source src="https://drive.google.com/uc?export=download&id=1K04FkvB0VO3ZldosEHGI-WAzAQmQIzR-" type="video/mp4"> -->
-                </video>
-                <div class="content2">
-                    <h1>@{{name}}/@{{username}}</h1>
-                    <!-- <button id="myBtn" onclick="myFunction()">Pause</button> -->
-                </div>
-            <!-- </div> -->
+            <video oncontextmenu="return false;" id="myVideo" controlsList="nodownload" controls autoplay @ended="onEnd()">
+                <source :src="'/images/'+film_addr" type="video/mp4">
+                <!-- <source src="https://drive.google.com/file/d/1K04FkvB0VO3ZldosEHGI-WAzAQmQIzR-/view?usp=sharing" type="video/mp4"> -->
+            </video>
+            <div class="content2">
+                <h1>@{{name}}/@{{username}}</h1>
+            </div>
         </div>
-        
+
     </div>
 </div>
 @endsection

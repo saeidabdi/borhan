@@ -62,6 +62,14 @@ Route::group(['prefix' => 'user'], function () {
     Route::get('/pass', 'UserController@pass');
     Route::post('/edit_pass', 'UserController@edit_pass');
     Route::get('/get_index', 'UserController@get_index');
+    Route::post('/get_stupost', 'UserController@get_stupost');
+    Route::get('/reportstu', 'UserController@reportstu');
+    Route::post('/report_stu', 'UserController@report_stu');
+    Route::post('/detale_stu', 'UserController@detale_stu');
+    Route::get('/admins', 'UserController@admins');
+    Route::post('/add_admin', 'UserController@add_admin');
+    Route::get('/get_admin', 'UserController@get_admin');
+    Route::post('/delete_admin', 'UserController@delete_admin');
 });
 Route::post('formSubmit', 'UserController@formSubmit');
 // ********** student
@@ -96,4 +104,15 @@ Route::group(['prefix' => 'teacher'], function () {
     Route::get('/pass', 'TeacherController@pass');
     Route::post('/edit_pass_teacher', 'TeacherController@edit_pass_teacher');
     Route::get('/plan', 'TeacherController@plan');
+    Route::get('/reportstu', 'TeacherController@reportstu');
+    Route::post('/report_stu_teacher', 'TeacherController@report_stu_teacher');
+});
+// ********** admin
+Route::group(['prefix' => 'admin'], function () {
+    Route::get('/index', 'AdminController@index');
+    Route::post('/get_branch_admin', 'AdminController@get_branch_admin');
+    Route::get('/film', 'AdminController@film');
+    Route::get('/reportstu', 'AdminController@reportstu');
+    Route::get('/report', 'AdminController@report');
+    Route::get('/pass', 'AdminController@pass');
 });

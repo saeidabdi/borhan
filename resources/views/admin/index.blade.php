@@ -1,4 +1,4 @@
-@extends('user.user')
+@extends('admin.admin')
 
 @section('content')
 <!-- Page Content  -->
@@ -124,15 +124,7 @@
             <!-- انتخاب کلاس های دانش آموز -->
             <div v-if="goto_class">
                 <h4>برنامه ی کلاسی @{{stu_name}}</h4>
-                <div class="col-md-3 right" style="padding-top: 10px;">
-                    <div class="form-group">
-                        <label class="label cat_lable">شعبه</label>
-                        <select class="form-control" v-model="branch_id" @change="change_branch()">
-                            <option v-for="branch in all_branch" :value="branch.id">@{{branch.name}}</option>
-                        </select>
-                    </div>
-                </div>
-                <div v-if="with_reshte" class="col-md-3 right" style="padding-top: 10px;">
+                <div v-if="!new_pass2" class="col-md-3 right" style="padding-top: 10px;">
                     <div class="form-group">
                         <label class="label cat_lable">درس</label>
                         <select class="form-control" v-model="lesson_id">
@@ -140,8 +132,8 @@
                         </select>
                     </div>
                 </div>
-                <button v-if="with_reshte" style="margin-top: 42px;" type="button" class="btn btn-success" @click="give_class_tostu()">اختصصاص درس به دانش آموز</button>
-                <button v-if="!with_reshte" style="margin-top: 42px;" type="button" class="btn btn-success" @click="give_class_tostu()">اختصاص همه ی دروس</button>
+                <button v-if="!new_pass2" style="margin-top: 42px;" type="button" class="btn btn-success" @click="give_class_tostu()">اختصصاص درس به دانش آموز</button>
+                <button v-if="new_pass2" style="margin-top: 42px;" type="button" class="btn btn-success" @click="give_class_tostu()">اختصاص همه ی دروس</button>
                 <button style="margin-top: 42px;" type="button" class="btn btn_borhan" @click="()=>{goto_class='',stu_id=''}">اتمام</button>
                 <!-- جدول نماش کلاس ها دانش آموز -->
                 <table v-if="stu_class.length" class="table table-striped table-bordered table-hover table-condensed">
@@ -360,5 +352,4 @@
         </div>
     </div>
 </div>
-
 @endsection

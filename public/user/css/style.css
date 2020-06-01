@@ -8518,6 +8518,12 @@ video::-webkit-media-controls-fullscreen-button {
 }
 .cl_in_b{
   display: inline-block;
+  margin-bottom: 10px;
+}
+.cl_in_b2{
+  display: inline-block;
+  padding-right: 30px;
+  margin-bottom: 10px;
 }
 .table{
   overflow: scroll;

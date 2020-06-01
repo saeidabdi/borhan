@@ -8,6 +8,8 @@ use App\Paye;
 use App\Reshte;
 use App\Teacher;
 use App\TeacherManage;
+use App\StuManagement;
+use App\Stu;
 use Session;
 use DB;
 use Illuminate\Http\Request;
@@ -128,5 +130,36 @@ class TeacherController extends Controller
     public function plan()
     {
         return view('teacher.plan');
+    }
+
+    public function reportstu()
+    {
+        return view('teacher.reportstu');
+    }
+
+    public function report_stu_teacher(Request $request)
+    {
+        $b_id = $request->b_id;
+        $p_id = $request->p_id;
+        $r_id = $request->r_id;
+        $l_id = $request->l_id;
+        $t_id = $request->t_id;
+
+
+        $count_lesson = StuManagement::where('b_id', $request->b_id)->where('l_id', $l_id)->groupBy('s_id')->select('s_id', DB::raw('count(*) as total'))->get();
+
+        
+        $ids = array();
+        foreach ($count_lesson as $k => $v) {
+            array_push($ids, $v->s_id);
+        }
+
+        if ($r_id) {
+            $stu = Stu::whereIn('id', $ids)->where('p_id', $request->p_id)->where('r_id', $request->r_id)->select('id', 'name', 'school', 'addr', 'last_avg', 'username')->get();
+        } else {
+            $stu = Stu::whereIn('id', $ids)->where('p_id', $request->p_id)->select('id', 'name', 'school', 'addr', 'last_avg', 'username')->get();
+        }
+
+        return $stu;
     }
 }

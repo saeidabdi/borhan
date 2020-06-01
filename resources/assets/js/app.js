@@ -18,7 +18,29 @@ import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 // dropzone component
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
-// video
+
+import VuePersianDatetimePicker from 'vue-persian-datetime-picker';
+Vue.use(VuePersianDatetimePicker, {
+    name: 'custom-date-picker',
+    props: {
+        inputFormat: 'YYYY-MM-DD',
+        format: 'jYYYY-jMM-jDD',
+        editable: false,
+        inputClass: 'form-control my-custom-class-name',
+        // placeholder: 'Please select a date',
+        altFormat: 'YYYY-MM-DD',
+        color: '#00acc1',
+        autoSubmit: false,
+    }
+})
+
+// excel 
+import excel from 'vue-excel-export'
+Vue.use(excel)
+
+// pdf
+import jsPDF from 'jspdf'
+
 
 
 /**
@@ -34,6 +56,7 @@ const router = new VueRouter({
     mode: 'history'
 })
 
+
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
 
 const app = new Vue({
@@ -46,6 +69,27 @@ const app = new Vue({
         film_id: '', all_film: [], i: 1, status: 0, message: '', view_id: '', all_absent: [],
         new_pass: '', new_pass2: '',
         stu_count: '', teacher_count: '', film_count: '', branch_count: '',
+        school_name: '', addr_stu: '', job_father: '', birthday: '', gender: 2, last_avg: '',
+        phone_home: '', phone_father: '', phone_mother: '', phone_stu: '',
+        json_fields: {
+            'نام': 'name',
+            'نام کاربری': 'username',
+            'جنسیت': {
+                field: 'gender',
+                callback: (value) => {
+                    if (value == 0) {
+                        return 'آقا'
+                    } else {
+                        return 'خانم'
+                    }
+                    // return `Landline Phone - ${value}`;
+                }
+            },
+            'تاریخ تولد': 'birthday',
+            'آخرین معدل': 'last_avg',
+
+        },
+        detale: [],
     },
     mounted() {
         var a = this;
@@ -59,7 +103,7 @@ const app = new Vue({
         window.addEventListener('popstate', (e) => {
             a.status = a.status - 1;
         })
-        if (window.location.pathname.split('/')[1] == 'user') {
+        if (window.location.pathname.split('/')[1] == 'user' || window.location.pathname.split('/')[1] == 'admin') {
             this.getuser();
         } else if (window.location.pathname.split('/')[1] == 'stu') {
             this.getstu();
@@ -67,8 +111,13 @@ const app = new Vue({
             this.getteach();
         }
     },
+    watch: {
+        'search_item': function () {
+            this.change_search();
+        }
+    },
     components: {
-        Loading
+        Loading,
     },
     router,
     methods: {
@@ -99,8 +148,13 @@ const app = new Vue({
                 }).then(response => {
                     this.isLoading = false;
                     if (response.data.username != undefined) {
-                        Swal.fire('', 'مدیر گرامی ' + response.data.name + ' شما وارد شدید', 'success');
-                        location.href = "/user/index";
+                        if (response.data.type == 1) {
+                            Swal.fire('', 'مدیر گرامی ' + response.data.name + ' شما وارد شدید', 'success');
+                            location.href = "/user/index";
+                        } else {
+                            Swal.fire('', 'مدیر گرامی ' + response.data.name + ' شما وارد شدید', 'success');
+                            location.href = "/admin/index";
+                        }
 
                     } else {
                         Swal.fire('', 'کاربر وجود ندارد', 'warning');
@@ -113,20 +167,23 @@ const app = new Vue({
                 });
         },
         getuser() {
-            // if (window.location.pathname != '/') {
             axios.get('/user/getuser').then(response => {
                 if (response.data.username != undefined) {
-                    if (window.location.pathname == '/user/branch' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report') {
+                    if (window.location.pathname == '/user/branch' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/user/admins') {
                         this.get_branch();
                     }
-                    if (window.location.pathname == '/user/paye' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report') {
+                    if (window.location.pathname == '/user/paye' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/admin/index' || window.location.pathname == '/admin/film' || window.location.pathname == '/admin/reportstu' || window.location.pathname == '/admin/report') {
                         this.get_paye();
                     }
-                    if (window.location.pathname == '/user/reshte' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report') {
+                    if (window.location.pathname == '/user/reshte' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/admin/index' || window.location.pathname == '/admin/film' || window.location.pathname == '/admin/report') {
                         this.get_reshte();
                     }
                     if (window.location.pathname == '/user/index') {
                         this.get_index();
+                    }
+                    if (response.data.type == 2) {
+                        this.branch_id = response.data.b_id;
+                        this.get_branch_admin(response.data.b_id);
                     }
                     this.logined = 1;
                     this.user_id = response.data.id
@@ -138,7 +195,6 @@ const app = new Vue({
                     this.logined = '';
                 }
             });
-            // }
         },
         add_branch() {
             this.isLoading = true;
@@ -268,7 +324,7 @@ const app = new Vue({
         },
         change_paye(a = 0) {
             this.with_reshte = '';
-            this.branch_type = 0;
+            this.branch_type = '';
             this.reshte_id = '';
             for (var i = 0; i < this.all_paye.length; i++) {
                 if (this.all_paye[i].id == this.paye_id) {
@@ -437,15 +493,25 @@ const app = new Vue({
         },
         // stu
         add_stu() {
-            if (this.stu_name && this.stu_pass && this.stu_user && this.paye_id) {
+            if (this.stu_name && this.stu_pass && this.stu_user && this.paye_id && this.gender) {
                 this.isLoading = true;
                 axios
                     .post('/user/add_stu', {
                         name: this.stu_name,
+                        school: this.school_name,
+                        addr: this.addr_stu,
+                        job_father: this.job_father,
+                        birthday: this.birthday,
+                        gender: this.gender,
+                        last_avg: this.last_avg,
                         username: this.stu_user,
                         pass: this.stu_pass,
                         p_id: this.paye_id,
                         r_id: this.reshte_id,
+                        phone_home: this.phone_home,
+                        phone_father: this.phone_father,
+                        phone_mother: this.phone_mother,
+                        phone_stu: this.phone_stu,
                         id: this.stu_id
                     }).then(response => {
                         this.isLoading = false
@@ -453,7 +519,11 @@ const app = new Vue({
                         if (response.data.id) {
                             this.stu_id = response.data.id;
                         }
-                        this.branch_id = '';
+                        if (window.location.pathname == '/admin/index') {
+
+                        } else {
+                            this.branch_id = '';
+                        }
                         this.branch_type = 0;
                         this.lesson_id = '';
                         this.stu_class = [];
@@ -487,7 +557,6 @@ const app = new Vue({
                 }).then(response => {
                     this.isLoading = false
                     this.get_stu_class();
-                    // Swal.fire('', response.data.mes, 'success')
                 })
         },
         get_stu_class() {
@@ -543,12 +612,26 @@ const app = new Vue({
                 })
         },
         stu_edit(stu) {
+            this.with_reshte = ''
             this.stu_id = stu.id;
             this.stu_name = stu.name;
+            this.school_name = stu.school;
+            this.addr_stu = stu.addr;
+            this.job_father = stu.job_father;
+            this.birthday = stu.birthday;
+            this.gender = stu.gender;
+            this.last_avg = stu.last_avg;
             this.stu_user = stu.username;
             this.stu_pass = stu.pass;
             this.paye_id = stu.p_id;
+            if (stu.r_id) {
+                this.with_reshte = 1;
+            }
             this.reshte_id = stu.r_id;
+            this.phone_home = stu.phone_home;
+            this.phone_father = stu.phone_father;
+            this.phone_mother = stu.phone_mother;
+            this.phone_stu = stu.phone_stu;
         },
         edit_active(stu) {
             var active;
@@ -568,14 +651,29 @@ const app = new Vue({
                         Swal.fire('', 'وضعیت غیر فعال شد', 'success');
                 })
         },
+        change_search() {
+            this.isLoading = true;
+            this.all_stu = [];
+            axios
+                .post('/user/get_stupost', {
+                    search_item: this.search_item
+                }).then(response => {
+                    this.isLoading = false;
+                    this.all_stu = response.data;
+                })
+        },
         // film
         change_lesson() {
             this.all_teacher = [];
             this.all_film = [];
             this.isLoading = true;
+            if(window.location.pathname == '/admin/film' || window.location.pathname == '/admin/report'){
+                var b_id = this.branch_id;
+            }
             axios
                 .post('/user/change_lesson', {
-                    l_id: this.lesson_id
+                    l_id: this.lesson_id,
+                    b_id : b_id,
                 }).then(response => {
                     this.isLoading = false;
                     this.all_teacher = response.data;
@@ -722,6 +820,88 @@ const app = new Vue({
                 Swal.fire('', 'کلمه عبور با تکرارش مطابقیت ندارد', 'warning');
             }
         },
+        // report_stu
+        report_stu() {
+            if (this.gender == 1) {
+                var gender = 1
+            } else if (this.gender == 0) {
+                var gender = 0
+            }
+            this.isLoading = true
+            axios
+                .post('/user/report_stu', {
+                    b_id: this.branch_id,
+                    p_id: this.paye_id,
+                    r_id: this.reshte_id,
+                    l_id: this.lesson_id,
+                    t_id: this.teacher_id,
+                    gender: this.gender,
+                }).then(response => {
+                    this.isLoading = false
+                    this.all_stu = response.data;
+                })
+        },
+        detale_stu(id) {
+            this.isLoading = true
+            axios
+                .post('/user/detale_stu', {
+                    id: id,
+                }).then(response => {
+                    this.isLoading = false
+                    this.detale = response.data[0];
+                    this.stu_id = response.data[0].id;
+                })
+        },
+        pdfdwonload() {
+            const doc = new jsPDF();
+            const contentHtml = $('.content_detale').html();
+            doc.addFont('NafeesNastaleeq ');
+            doc.setFont('NafeesNastaleeq ');
+            doc.setLanguage("ar-SA")
+            doc.fromHTML('سلام دوستان', {
+                lang: 'ar',
+                align: 'right',
+            });
+            doc.save("sample.pdf");
+        },
+        // admin
+        add_admin() {
+            this.isLoading = true;
+            axios
+                .post('/user/add_admin', {
+                    name: this.stu_name,
+                    username: this.stu_user,
+                    pass: this.stu_pass,
+                    b_id: this.branch_id,
+                }).then(response => {
+                    this.isLoading = false
+                    Swal.fire('', response.data.mes, 'success')
+                })
+        },
+        get_admin(a = 0) {
+            if (a == 1) {
+                this.isLoading = true
+            }
+            axios
+                .get('/user/get_admin')
+                .then(response => {
+                    if (a == 1) {
+                        this.isLoading = false
+                    }
+                    this.all_lesson = response.data;
+                })
+        },
+        delete_admin(admin_id) {
+            this.isLoading = true;
+            axios
+                .post('/user/delete_admin', {
+                    id: admin_id
+                }).then(response => {
+                    this.isLoading = false;
+                    this.get_admin();
+                    Swal.fire('', 'مدیر حذف شد', 'success')
+                })
+        },
         // *********************** student
         btn_menu() {
             if (this.i == 0) {
@@ -744,7 +924,11 @@ const app = new Vue({
                     if (response.data.username != undefined) {
                         if (response.data.active == 1) {
                             if (getCookie('user')) {
-                                Swal.fire('', 'دانش آموز گرامی ' + response.data.name + ' شما وارد شدید', 'success');
+                                if (response.data.gender == 1) {
+                                    Swal.fire('', 'دانش آموز گرامی خانم ' + response.data.name + ' شما وارد شدید', 'success');
+                                } else {
+                                    Swal.fire('', 'دانش آموز گرامی آقای ' + response.data.name + ' شما وارد شدید', 'success');
+                                }
                                 location.href = "/stu/index";
                             } else {
                                 Swal.fire('', 'این حساب فعال است', 'warning');
@@ -876,9 +1060,18 @@ const app = new Vue({
                     id: id,
                 }).then(response => {
                     this.name = response.data[0].name;
+                    this.gender = response.data[0].gender;
                     this.username = response.data[0].username;
                     this.paye_name = response.data[0].p_title;
                     this.reshte_name = response.data[0].r_title;
+                    this.school_name = response.data[0].school;
+                    this.birthday = response.data[0].birthday;
+                    this.last_avg = response.data[0].last_avg;
+                    this.addr_stu = response.data[0].addr;
+                    this.phone_home = response.data[0].phone_home;
+                    this.phone_father = response.data[0].phone_father;
+                    this.phone_mother = response.data[0].phone_mother;
+                    this.phone_stu = response.data[0].phone_stu;
                     this.isLoading = false;
                 })
         },
@@ -931,7 +1124,7 @@ const app = new Vue({
                         if (window.location.pathname == '/teacher/index') {
                             this.get_paye_teacher(response.data.id);
                         }
-                        if (window.location.pathname == '/teacher/dars') {
+                        if (window.location.pathname == '/teacher/dars' || window.location.pathname == '/teacher/reportstu') {
                             this.get_branch_teacher(response.data.id);
                         }
                         if (window.location.pathname == '/teacher/plan') {
@@ -1026,6 +1219,36 @@ const app = new Vue({
                 Swal.fire('', 'کلمه عبور با تکرارش مطابقیت ندارد', 'warning');
             }
         },
+        report_stu_teacher() {
+            if (this.branch_id && this.paye_id && this.lesson_id) {
+                this.isLoading = true
+                axios
+                    .post('/teacher/report_stu_teacher', {
+                        b_id: this.branch_id,
+                        p_id: this.paye_id,
+                        r_id: this.reshte_id,
+                        l_id: this.lesson_id,
+                    }).then(response => {
+                        this.isLoading = false
+                        this.all_stu = response.data;
+                    })
+            } else {
+                Swal.fire('', 'لطفا تمام فیلد ها رو کامل کنید', 'warning');
+            }
+        },
+        // **************************** admin
+        get_branch_admin(b_id) {
+            axios
+                .post('/admin/get_branch_admin', {
+                    id: b_id,
+                }).then(response => {
+                    if (response.data.type == 0) {
+                        this.lesson_id = 0;
+                        this.new_pass2 = 1;
+                    }
+                });
+        },
+
     },
 });
 function getCookie(name) {

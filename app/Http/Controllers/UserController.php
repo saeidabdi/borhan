@@ -8,6 +8,7 @@ use App\Branch;
 use App\Film;
 use App\Lesson;
 use App\Paye;
+use App\Phone;
 use App\Reshte;
 use App\Special_film;
 use App\Stu;
@@ -177,7 +178,11 @@ class UserController extends Controller
         if ($id) {
             $new_lesson = Lesson::where('id', $id)->first();
             $new_lesson->name = $request->name;
-            $new_lesson->status = $request->status;
+            if ($request->status) {
+                $new_lesson->status = $request->status;
+            }else{
+                $new_lesson->status = 0;
+            }
             $new_lesson->p_id = $request->paye_id;
             $new_lesson->r_id = $request->reshte_id;
 
@@ -187,7 +192,11 @@ class UserController extends Controller
         } else {
             $new_lesson = new Lesson;
             $new_lesson->name = $request->name;
-            $new_lesson->status = $request->status;
+            if ($request->status) {
+                $new_lesson->status = $request->status;
+            }else{
+                $new_lesson->status = 0;
+            }
             $new_lesson->p_id = $request->paye_id;
             $new_lesson->r_id = $request->reshte_id;
 
@@ -201,9 +210,14 @@ class UserController extends Controller
     {
         $p_id = $request->paye_id;
         $status = $request->status;
+        if ($request->status) {
+            $status = $request->status;
+        }else{
+            $status = 0;
+        }
         $r_id = $request->reshte_id;
         if (!$r_id) {
-            $all_lesson = Lesson::where('p_id', $p_id)->where('r_id', $r_id)->where('status', $status)->get();
+            $all_lesson = Lesson::where('p_id', $p_id)->where('status', $status)->get();
             return $all_lesson;
         } else {
             $all_lesson = Lesson::where('p_id', $p_id)->where('r_id', $r_id)->where('status', $status)->get();
@@ -323,24 +337,52 @@ class UserController extends Controller
         if ($id) {
             $new_stu = Stu::where('id', $id)->first();
             $new_stu->name = $request->name;
+            $new_stu->school = $request->school;
+            $new_stu->addr = $request->addr;
+            $new_stu->job_father = $request->job_father;
+            $new_stu->birthday = $request->birthday;
+            $new_stu->gender = $request->gender;
+            $new_stu->last_avg = $request->last_avg;
             $new_stu->username = $request->username;
             $new_stu->pass = $request->pass;
             $new_stu->p_id = $request->p_id;
             $new_stu->r_id = $request->r_id;
 
             if ($new_stu->update()) {
-                return response()->json(['mes' => 'دانش آموز بروزرسانی شد']);
+                $phone = Phone::where('stu_id', $id)->first();
+                $phone->phone_home = $request->phone_home;
+                $phone->phone_father = $request->phone_father;
+                $phone->phone_mother = $request->phone_mother;
+                $phone->phone_stu = $request->phone_stu;
+                $phone->stu_id = $new_stu->id;
+                if ($phone->update()) {
+                    return response()->json(['mes' => 'دانش آموز بروزرسانی شد']);
+                }
             }
         } else {
             $new_stu = new Stu;
             $new_stu->name = $request->name;
+            $new_stu->school = $request->school;
+            $new_stu->addr = $request->addr;
+            $new_stu->job_father = $request->job_father;
+            $new_stu->birthday = $request->birthday;
+            $new_stu->gender = $request->gender;
+            $new_stu->last_avg = $request->last_avg;
             $new_stu->username = $request->username;
             $new_stu->pass = $request->pass;
             $new_stu->p_id = $request->p_id;
             $new_stu->r_id = $request->r_id;
 
             if ($new_stu->save()) {
-                return response()->json(['mes' => 'دانش آموز جدید ایجاد شد', 'id' => $new_stu->id]);
+                $phone = new Phone;
+                $phone->phone_home = $request->phone_home;
+                $phone->phone_father = $request->phone_father;
+                $phone->phone_mother = $request->phone_mother;
+                $phone->phone_stu = $request->phone_stu;
+                $phone->stu_id = $new_stu->id;
+                if ($phone->save()) {
+                    return response()->json(['mes' => 'دانش آموز جدید ایجاد شد', 'id' => $new_stu->id]);
+                }
             }
         }
     }
@@ -350,7 +392,7 @@ class UserController extends Controller
         $p_id = $request->paye_id;
         $r_id = $request->reshte_id;
 
-        $all_lesson = Lesson::where('p_id', $p_id)->where('r_id', $r_id)->get();
+        $all_lesson = Lesson::orWhere('r_id', $r_id)->orWhere('r_id', null)->where('p_id', $p_id)->get();
         return $all_lesson;
     }
 
@@ -393,8 +435,25 @@ class UserController extends Controller
 
     public function get_stu()
     {
-        $all_paye = Stu::all();
-        return $all_paye;
+        $all_stu = DB::table('stu')
+            ->leftJoin('phone', 'stu.id', '=', 'phone.stu_id')
+            ->select('stu.*', 'phone.phone_home', 'phone.phone_father', 'phone.phone_mother', 'phone.phone_stu')
+            ->limit(10)
+            ->get();
+        // $all_paye = Stu::all();
+        return $all_stu;
+    }
+
+    public function get_stupost(Request $request)
+    {
+        $all_stu = DB::table('stu')
+            ->where('name', 'like', '%' . $request->search_item . '%')
+            ->leftJoin('phone', 'stu.id', '=', 'phone.stu_id')
+            ->select('stu.*', 'phone.phone_home', 'phone.phone_father', 'phone.phone_mother', 'phone.phone_stu')
+            ->limit(10)
+            ->get();
+        // $all_paye = Stu::all();
+        return $all_stu;
     }
 
     public function delete_stu(Request $request)
@@ -413,12 +472,22 @@ class UserController extends Controller
 
     public function change_lesson(Request $request)
     {
-        $teachers = DB::table('teacher_management')
-            ->where('teacher_management.l_id', $request->l_id)
-            ->distinct('teacher_management.t_id')
-            ->leftJoin('teacher', 'teacher_management.t_id', '=', 'teacher.id')
-            ->select('teacher.id', 'teacher.name')
-            ->get();
+        if ($request->b_id) {
+            $teachers = DB::table('teacher_management')
+                ->where('teacher_management.l_id', $request->l_id)
+                ->where('teacher_management.b_id', $request->b_id)
+                ->distinct('teacher_management.t_id')
+                ->leftJoin('teacher', 'teacher_management.t_id', '=', 'teacher.id')
+                ->select('teacher.id', 'teacher.name')
+                ->get();
+        } else {
+            $teachers = DB::table('teacher_management')
+                ->where('teacher_management.l_id', $request->l_id)
+                ->distinct('teacher_management.t_id')
+                ->leftJoin('teacher', 'teacher_management.t_id', '=', 'teacher.id')
+                ->select('teacher.id', 'teacher.name')
+                ->get();
+        }
 
         return $teachers;
     }
@@ -595,8 +664,6 @@ class UserController extends Controller
         }
     }
 
-
-
     public function get_index()
     {
         $stu = Stu::count();
@@ -606,7 +673,7 @@ class UserController extends Controller
 
         // activest_teacher
         $activest_teacher = DB::table('film')
-        ->groupBy('t_id')->select('t_id', DB::raw('count(*) as total'))->get();
+            ->groupBy('t_id')->select('t_id', DB::raw('count(*) as total'))->get();
 
         $max = -9999999; //will hold max val
         $found_item = []; //will hold item with max val;
@@ -622,7 +689,7 @@ class UserController extends Controller
 
         // activest_student
         $lasttime = time() - 7 * 86400;
-        $activest_student = views_film::where('open_time','>',$lasttime)->groupBy('stu_id')->select('stu_id', DB::raw('count(*) as total'))->get();
+        $activest_student = views_film::where('open_time', '>', $lasttime)->groupBy('stu_id')->select('stu_id', DB::raw('count(*) as total'))->get();
 
         $max2 = -9999999; //will hold max val
         $found_item2 = []; //will hold item with max val;
@@ -635,6 +702,118 @@ class UserController extends Controller
         }
         $activest_student = Stu::find($found_item2->stu_id);
 
-        return response()->json(['stu' => $stu, 'film' => $film, 'branch' => $branch, 'teacher' => $teacher, 'activest_teacher' => $activest_teacher,'activest_student'=>$activest_student]);
+        return response()->json(['stu' => $stu, 'film' => $film, 'branch' => $branch, 'teacher' => $teacher, 'activest_teacher' => $activest_teacher, 'activest_student' => $activest_student]);
+    }
+
+    // reportstu
+
+    public function reportstu()
+    {
+        return view('user.reportstu');
+    }
+
+    public function report_stu(Request $request)
+    {
+        $b_id = $request->b_id;
+        $p_id = $request->p_id;
+        $r_id = $request->r_id;
+        $l_id = $request->l_id;
+        $t_id = $request->t_id;
+        $gender = $request->gender;
+
+
+
+        $count_branch = StuManagement::where('b_id', $request->b_id)->groupBy('s_id')->select('s_id', DB::raw('count(*) as total'))->get();
+        $ids = array();
+        foreach ($count_branch as $k => $v) {
+            array_push($ids, $v->s_id);
+        }
+
+        if ($b_id && !$p_id && !$r_id && !$l_id && !$t_id) {
+            $stu = Stu::whereIn('id', $ids)->select('id', 'name', 'school', 'addr', 'birthday', 'last_avg', 'gender', 'username')->get();
+        } elseif ($b_id && $p_id && !$r_id && !$l_id && !$t_id) {
+            $stu = Stu::whereIn('id', $ids)->where('p_id', $request->p_id)->select('id', 'name', 'school', 'addr', 'birthday', 'last_avg', 'gender', 'username')->get();
+        } elseif ($b_id && $p_id && $r_id && !$l_id && !$t_id) {
+            $stu = Stu::whereIn('id', $ids)->where('p_id', $request->p_id)->where('r_id', $request->r_id)->select('id', 'name', 'school', 'addr', 'birthday', 'last_avg', 'gender', 'username')->get();
+        } elseif ($b_id && $p_id && $l_id) {
+            $count_lesson = StuManagement::where('b_id', $request->b_id)->where('l_id', $l_id)->groupBy('s_id')->select('s_id', DB::raw('count(*) as total'))->get();
+            $ids = array();
+            foreach ($count_lesson as $k => $v) {
+                array_push($ids, $v->s_id);
+            }
+            if ($r_id) {
+                $stu = Stu::whereIn('id', $ids)->where('p_id', $request->p_id)->where('r_id', $request->r_id)->select('id', 'name', 'school', 'addr', 'birthday', 'last_avg', 'gender', 'username')->get();
+            } else {
+                $stu = Stu::whereIn('id', $ids)->where('p_id', $request->p_id)->select('id', 'name', 'school', 'addr', 'birthday', 'last_avg', 'gender', 'username')->get();
+            }
+        } elseif (!$b_id && $p_id && !$l_id) {
+            if ($r_id) {
+                if ($gender == 0 || $gender == 1) {
+                    $stu = Stu::where('p_id', $request->p_id)->where('r_id', $request->r_id)->where('gender', $gender)->select('id', 'name', 'school', 'addr', 'birthday', 'last_avg', 'gender', 'username')->get();
+                } else {
+                    $stu = Stu::where('p_id', $request->p_id)->where('r_id', $request->r_id)->select('id', 'name', 'school', 'addr', 'birthday', 'last_avg', 'gender', 'username')->get();
+                }
+            } else {
+                if ($gender == 0 || $gender == 1) {
+                    $stu = Stu::where('p_id', $request->p_id)->where('gender', $gender)->select('id', 'name', 'school', 'addr', 'birthday', 'last_avg', 'gender', 'username')->get();
+                } else {
+                    $stu = Stu::where('p_id', $request->p_id)->select('id', 'name', 'school', 'addr', 'birthday', 'last_avg', 'gender', 'username')->get();
+                }
+            }
+        } else {
+            $stu = [];
+        }
+
+        return $stu;
+    }
+
+    public function detale_stu(Request $request)
+    {
+        $all_stu = DB::table('stu')
+            ->where('stu.id', $request->id)
+            ->leftJoin('phone', 'stu.id', '=', 'phone.stu_id')
+            ->leftJoin('paye', 'stu.p_id', '=', 'paye.id')
+            ->leftJoin('reshte', 'stu.r_id', '=', 'reshte.id')
+            ->select('stu.*', 'phone.phone_home', 'phone.phone_father', 'phone.phone_mother', 'phone.phone_stu', 'paye.title as p_title', 'reshte.title as r_title')
+            ->get();
+
+        return $all_stu;
+    }
+
+    public function admins()
+    {
+        return view('user.admins');
+    }
+
+    public function add_admin(Request $request)
+    {
+        $new_lesson = new User;
+        $new_lesson->name = $request->name;
+        $new_lesson->username = $request->username;
+        $new_lesson->pass = $request->pass;
+        $new_lesson->b_id = $request->b_id;
+        $new_lesson->type = 2;
+
+        if ($new_lesson->save()) {
+            return response()->json(['mes' => 'مدیر جدید ایجاد شد']);
+        }
+    }
+
+    public function get_admin()
+    {
+        $admins = DB::table('users')
+            ->where('users.type', 2)
+            ->leftJoin('branch', 'users.b_id', '=', 'branch.id')
+            ->select('users.*', 'branch.name as b_name')
+            ->get();
+
+        return $admins;
+    }
+
+    public function delete_admin(Request $request)
+    {
+        if (User::where('id', $request->id)->delete()) {
+            return response()->json(['success' => 'مدیر با موفقیت حذف شد']);
+        }
     }
 }

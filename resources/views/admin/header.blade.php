@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>پنل معلم </title>
+    <title>پنل مدیریت</title>
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -24,42 +24,36 @@
                 <h1>
                     <a class="logo">
                         @{{name}}
-                        <span>معلم</span>
+                        <span>مدیر</span>
                     </a>
                 </h1>
                 <ul class="list-unstyled components mb-5">
                     <li class="active">
-                        <a href="/teacher/index">
+                        <a href="/admin/index">
+                            <span style="margin-left: 5px" class="fas fa-graduation-cap mr-3"></span>
+                            مدیریت دانش آموزان
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="/admin/film">
                             <span style="margin-left: 5px" class="fas fa-film mr-3"></span>
-                            فیلم
+                            مدیریت فیلم
                         </a>
                     </li>
                     <li class="active">
-                        <a href="/teacher/profile">
-                            <span style="margin-left: 5px" class="fas fa-user mr-3"></span>
-                            پروفایل
-                        </a>
-                    </li>
-                    <li class="active dropdown">
-                        <a href="/teacher/dars">
-                            <span style="margin-left: 5px" class="fas fa-chart-bar mr-3"></span>
-                            گزارشات
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a class="dropdown-item" href="/teacher/reportstu">
+                        <a href="/admin/reportstu">
                             <span style="margin-left: 5px" class="fas fa-file-excel mr-3"></span>
-                            دانش آموزان
-                        </a>
-                    </li>
-                    <li class="active dropdown">
-                        <a href="/teacher/plan">
-                            <span style="margin-left: 5px" class="fas fa-tasks mr-3"></span>
-                            برنامه کلاس ها
+                            دانش آموز
                         </a>
                     </li>
                     <li class="active">
-                        <a href="/teacher/pass">
+                        <a href="/admin/report">
+                            <span style="margin-left: 5px" class="fas  fa-check-square mr-3"></span>
+                            حضور و غیاب
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="/admin/pass">
                             <span style="margin-left: 5px" class="fas fa-key mr-3"></span>
                             تغیر کلمه عبور
                         </a>

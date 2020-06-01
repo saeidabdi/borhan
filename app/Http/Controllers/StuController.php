@@ -159,7 +159,8 @@ class StuController extends Controller
         ->where('stu.id', $request->id)
         ->leftJoin('paye', 'stu.p_id', '=', 'paye.id')
         ->leftJoin('reshte', 'stu.r_id', '=', 'reshte.id')
-        ->select('stu.name','stu.username','paye.title as p_title','reshte.title as r_title')
+        ->leftJoin('phone', 'stu.id', '=', 'phone.stu_id')
+        ->select('stu.*','phone.*','paye.title as p_title','reshte.title as r_title')
         ->get();
 
         return $stu;

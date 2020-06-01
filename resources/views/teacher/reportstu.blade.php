@@ -3,7 +3,7 @@
 @section('content')
 <!-- Page Content  -->
 <div v-cloak id="content" class="p-4 p-md-5 pt-5">
-    <table class="table table-striped table-bordered table-hover table-condensed">
+    <table v-if="!stu_id" class="table table-striped table-bordered table-hover table-condensed">
         <div class="col-md-3 right" style="padding-top: 10px;">
             <div class="form-group">
                 <label class="label cat_lable">شعبه</label>
@@ -40,42 +40,38 @@
         <div class="col-md-3 right" style="padding-top: 10px;">
             <div class="form-group">
                 <label class="label cat_lable">درس</label>
-                <select class="form-control" v-model="lesson_id" @change="get_film()">
+                <select class="form-control" v-model="lesson_id">
                     <option v-for="lesson in all_lesson" :value="lesson.id">@{{lesson.name}}</option>
                 </select>
             </div>
         </div>
-        <div class="col-md-3 right" style="padding-top: 10px;">
-            <div class="form-group">
-                <label class="label cat_lable">فیلم</label>
-                <select class="form-control" v-model="film_id">
-                    <option v-for="film in all_film" :value="film.id">@{{film.title}}</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-md-3 right list_button_insert">
-            <button style="margin-top: 42px;" type="button" class="btn btn_borhan" @click="report_absent()">گزارش حضور</button>
+        <div v-if="!stu_id" class="col-md-3 right list_button_insert">
+            <button style="margin-top: 42px;display:inline-block;" type="button" class="btn btn_borhan" @click="report_stu_teacher()">گزارش </button>
+            <export-excel :data="all_stu" style="display: inline-block;" :fields="json_fields" name="students_file">
+                <button style="margin-top: 42px;display:inline-block;" type="button" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i>
+                    اکسل </button>
+            </export-excel>
         </div>
         <thead>
             <th>ردیف</th>
             <th>دانش آموز</th>
-            <th>نام کاربری</th>
-            <th>زمان شروع</th>
-            <th>زمان پایان</th>
-            <th>مدت حضور</th>
+            <th>کد ملی</th>
+            <!-- <th>تاریخ تولد</th> -->
+            <th>آخرین معدل</th>
         </thead>
         <tbody>
-            <tr v-for="absent in all_absent">
-                <td>@{{absent.id}}</td>
-                <td>@{{absent.name}}</td>
-                <td>@{{absent.username}}</td>
-                <td>@{{absent.open_time}}</td>
-                <td>@{{absent.close_time}}</td>
-                <td>@{{(absent.extra/60).toString().substring(0,4)}} دقیقه</td>
+            <tr v-for="(stu, index) in all_stu">
+                <td>@{{index+1}}</td>
+                <td>@{{stu.name}}</td>
+                <td>@{{stu.username}}</td>
+                <!-- <td>@{{stu.birthday}}</td> -->
+                <td>@{{stu.last_avg}}</td>
             </tr>
         </tbody>
-
     </table>
+
+
 </div>
 
 @endsection

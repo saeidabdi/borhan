@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" type="text/css" href="/as/fonts/fontAwsome/css/all.css">
     <link rel="stylesheet" type="text/css" href="/as/css/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/as/css/jquery.Bootstrap-PersianDateTimePicker.css" />
     <link rel="stylesheet" href="/user/css/style.css">
 </head>
 
@@ -68,6 +69,12 @@
                         </a>
                     </li>
                     <li class="active">
+                        <a href="/user/admins">
+                            <span style="margin-left: 5px" class="fas fa-users mr-3"></span>
+                            مدیران داخلی
+                        </a>
+                    </li>
+                    <li class="active">
                         <a href="/user/film">
                             <span style="margin-left: 5px" class="fas fa-film mr-3"></span>
                             مدیریت فیلم
@@ -78,11 +85,17 @@
                             <span style="margin-left: 5px" class="fas fa-chart-bar mr-3"></span>
                             گزارشات
                         </a>
-                        <ul style="background: #ea4335 none repeat scroll 0% 0%;" class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <ul dir="rtl" style="background: #ea4335 none repeat scroll 0% 0%;text-align: right;" class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li class="active">
                                 <a class="dropdown-item" href="/user/report">
                                     <span style="margin-left: 5px" class="fas  fa-check-square mr-3"></span>
                                     حضور و غیاب
+                                </a>
+                            </li>
+                            <li class="active">
+                                <a class="dropdown-item" href="/user/reportstu">
+                                    <span style="margin-left: 5px" class="fas fa-file-excel mr-3"></span>
+                                    دانش آموز
                                 </a>
                             </li>
                         </ul>
