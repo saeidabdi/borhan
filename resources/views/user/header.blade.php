@@ -98,6 +98,12 @@
                                     دانش آموز
                                 </a>
                             </li>
+                            <li class="active">
+                                <a class="dropdown-item" href="/user/exam">
+                                    <span style="margin-left: 5px" class="fas fa-table mr-3"></span>
+                                    امتحانات
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li class="active">

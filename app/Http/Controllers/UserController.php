@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Branch;
+use App\Exam;
 use App\Film;
 use App\Lesson;
 use App\Paye;
@@ -180,7 +181,7 @@ class UserController extends Controller
             $new_lesson->name = $request->name;
             if ($request->status) {
                 $new_lesson->status = $request->status;
-            }else{
+            } else {
                 $new_lesson->status = 0;
             }
             $new_lesson->p_id = $request->paye_id;
@@ -194,7 +195,7 @@ class UserController extends Controller
             $new_lesson->name = $request->name;
             if ($request->status) {
                 $new_lesson->status = $request->status;
-            }else{
+            } else {
                 $new_lesson->status = 0;
             }
             $new_lesson->p_id = $request->paye_id;
@@ -212,7 +213,7 @@ class UserController extends Controller
         $status = $request->status;
         if ($request->status) {
             $status = $request->status;
-        }else{
+        } else {
             $status = 0;
         }
         $r_id = $request->reshte_id;
@@ -815,5 +816,81 @@ class UserController extends Controller
         if (User::where('id', $request->id)->delete()) {
             return response()->json(['success' => 'مدیر با موفقیت حذف شد']);
         }
+    }
+
+    public function exam()
+    {
+        return view('user.exam');
+    }
+
+    public function add_exam(Request $request)
+    {
+        $id = $request->id;
+        if ($id) {
+            $exam = Exam::where('id', $id)->first();
+            $exam->title = $request->title;
+            $exam->b_id = $request->b_id;
+            $exam->p_id = $request->p_id;
+            $exam->r_id = $request->r_id;
+            $exam->l_id = $request->l_id;
+            $exam->t_id = $request->t_id;
+
+            if ($exam->update()) {
+                return response()->json(['mes' => 'آزمون بروزرسانی شد', 'id' => $exam->id, 'type' => 'update']);
+            }
+        } else {
+            $exam = new Exam;
+            $exam->title = $request->title;
+            $exam->b_id = $request->b_id;
+            $exam->p_id = $request->p_id;
+            $exam->r_id = $request->r_id;
+            $exam->l_id = $request->l_id;
+            $exam->t_id = $request->t_id;
+
+            if ($exam->save()) {
+                return response()->json(['mes' => 'آزمون جدید ایجاد شد', 'id' => $exam->id, 'type' => 'insert']);
+            }
+        }
+    }
+
+    public function add_grade(Request $request)
+    {
+        if ($request->edited) {
+            foreach ($request->arrgrade as $key => $value) {
+                DB::table('result_exam')->where('exam_id',$request->exam_id)->where('stu_id',explode(',', $value)[0])->update([
+                    'grade' => explode(',', $value)[1]
+                ]);
+            }
+            return response()->json(['mes' => 'نمرات با موفقیت بروزرسانی شد']);
+        } else {
+            foreach ($request->arrgrade as $key => $value) {
+                DB::table('result_exam')->insert([
+                    'exam_id' => $request->exam_id,
+                    'stu_id' => explode(',', $value)[0],
+                    'grade' => explode(',', $value)[1]
+                ]);
+            }
+            return response()->json(['mes' => 'نمرات با موفقیت ثبت شد']);
+        }
+    }
+
+    public function get_exam(Request $request)
+    {
+        $all_exam = Exam::where('b_id', $request->b_id)->where('p_id', $request->p_id)->where('r_id', $request->r_id)->where('l_id', $request->l_id)->where('t_id', $request->t_id)->get();
+        return $all_exam;
+    }
+
+    public function delete_exam(Request $request)
+    {
+        if (Exam::where('id', $request->id)->delete()) {
+            return response()->json(['success' => 'آزمون با موفقیت حذف شد']);
+        }
+    }
+
+    public function get_result_exam(Request $request)
+    {
+        $ids = DB::table('result_exam')->where('exam_id', $request->exam_id)->get();
+
+        return $ids;
     }
 }

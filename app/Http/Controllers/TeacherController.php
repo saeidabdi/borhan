@@ -162,4 +162,9 @@ class TeacherController extends Controller
 
         return $stu;
     }
+
+    public function exam()
+    {
+        return view('teacher.exam');
+    }
 }

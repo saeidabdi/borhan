@@ -53,6 +53,12 @@
                         </a>
                     </li>
                     <li class="active">
+                        <a class="dropdown-item" href="/admin/exam">
+                            <span style="margin-left: 5px" class="fas fa-table mr-3"></span>
+                            امتحانات
+                        </a>
+                    </li>
+                    <li class="active">
                         <a href="/admin/pass">
                             <span style="margin-left: 5px" class="fas fa-key mr-3"></span>
                             تغیر کلمه عبور

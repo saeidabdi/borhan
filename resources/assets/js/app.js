@@ -89,7 +89,7 @@ const app = new Vue({
             'آخرین معدل': 'last_avg',
 
         },
-        detale: [],
+        detale: [], exam_id: '', all_exam: [],edited:0,
     },
     mounted() {
         var a = this;
@@ -169,13 +169,13 @@ const app = new Vue({
         getuser() {
             axios.get('/user/getuser').then(response => {
                 if (response.data.username != undefined) {
-                    if (window.location.pathname == '/user/branch' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/user/admins') {
+                    if (window.location.pathname == '/user/branch' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/user/admins' || window.location.pathname == '/user/exam') {
                         this.get_branch();
                     }
-                    if (window.location.pathname == '/user/paye' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/admin/index' || window.location.pathname == '/admin/film' || window.location.pathname == '/admin/reportstu' || window.location.pathname == '/admin/report') {
+                    if (window.location.pathname == '/user/paye' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/admin/index' || window.location.pathname == '/admin/film' || window.location.pathname == '/admin/reportstu' || window.location.pathname == '/admin/report' || window.location.pathname == '/user/exam' || window.location.pathname == '/admin/exam') {
                         this.get_paye();
                     }
-                    if (window.location.pathname == '/user/reshte' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/admin/index' || window.location.pathname == '/admin/film' || window.location.pathname == '/admin/report') {
+                    if (window.location.pathname == '/user/reshte' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/admin/index' || window.location.pathname == '/admin/film' || window.location.pathname == '/admin/report' || window.location.pathname == '/user/exam' || window.location.pathname == '/admin/exam') {
                         this.get_reshte();
                     }
                     if (window.location.pathname == '/user/index') {
@@ -667,13 +667,13 @@ const app = new Vue({
             this.all_teacher = [];
             this.all_film = [];
             this.isLoading = true;
-            if(window.location.pathname == '/admin/film' || window.location.pathname == '/admin/report'){
+            if (window.location.pathname == '/admin/film' || window.location.pathname == '/admin/report') {
                 var b_id = this.branch_id;
             }
             axios
                 .post('/user/change_lesson', {
                     l_id: this.lesson_id,
-                    b_id : b_id,
+                    b_id: b_id,
                 }).then(response => {
                     this.isLoading = false;
                     this.all_teacher = response.data;
@@ -902,6 +902,95 @@ const app = new Vue({
                     Swal.fire('', 'مدیر حذف شد', 'success')
                 })
         },
+        // exam
+        add_exam() {
+            this.isLoading = true;
+            axios
+                .post('/user/add_exam', {
+                    title: this.film_name,
+                    b_id: this.branch_id,
+                    p_id: this.paye_id,
+                    r_id: this.reshte_id,
+                    l_id: this.lesson_id,
+                    t_id: this.teacher_id,
+                    id : this.exam_id,
+                }).then(response => {
+                    this.exam_id = response.data.id;
+                    if(response.data.type == 'update'){
+                        this.get_result_exam(response.data.id);
+                    }
+                    this.report_stu();
+                    this.isLoading = false
+                    this.goto_class = 1;
+                })
+        },
+        add_grade() {
+            let arrgrade = [];
+            for (var i = 0; i < this.specail_ids.length; i++) {
+                if (this.specail_ids[i]) {
+                    arrgrade.push(i + ',' + this.specail_ids[i])
+                }
+            }
+            this.isLoading = true;
+            axios
+                .post('/user/add_grade', {
+                    exam_id: this.exam_id,
+                    arrgrade: arrgrade,
+                    edited : this.edited,
+                }).then(response => {
+                    this.isLoading = false
+                    Swal.fire('', response.data.mes, 'success')
+                    this.goto_class = '';
+                })
+        },
+        get_exam() {
+            this.isLoading = true;
+            axios
+                .post('/user/get_exam', {
+                    b_id: this.branch_id,
+                    p_id: this.paye_id,
+                    r_id: this.reshte_id,
+                    l_id: this.lesson_id,
+                    t_id: this.teacher_id,
+                })
+                .then(response => {
+                    this.isLoading = false;
+                    this.all_exam = response.data;
+                })
+        },
+        delete_exam(exam_id) {
+            this.isLoading = true
+            axios
+                .post('/user/delete_exam', {
+                    id: exam_id
+                }).then(response => {
+                    this.isLoading = false
+                    this.get_exam();
+                    Swal.fire('', response.data.mes, 'success')
+                })
+        },
+        exam_edit(exam) {
+            this.specail_ids = [];
+            this.exam_id = exam.id;
+            this.film_name = exam.title;
+            this.branch_id = exam.b_id;
+            this.paye_id = exam.p_id;
+            this.reshte_id = exam.r_id;
+            this.lesson_id = exam.l_id;
+            this.teacher_id = exam.t_id;
+        },
+        get_result_exam(id){
+            this.isLoading = true
+            this.edited = 1;
+            axios
+            .post('/user/get_result_exam',{exam_id : id})
+            .then(response=>{
+                for(var i=0;i<response.data.length;i++){
+                    this.specail_ids[response.data[i].stu_id] = response.data[i].grade;
+                }
+                this.isLoading = false
+            })
+        },
         // *********************** student
         btn_menu() {
             if (this.i == 0) {
@@ -1124,7 +1213,7 @@ const app = new Vue({
                         if (window.location.pathname == '/teacher/index') {
                             this.get_paye_teacher(response.data.id);
                         }
-                        if (window.location.pathname == '/teacher/dars' || window.location.pathname == '/teacher/reportstu') {
+                        if (window.location.pathname == '/teacher/dars' || window.location.pathname == '/teacher/reportstu' || window.location.pathname == '/teacher/exam') {
                             this.get_branch_teacher(response.data.id);
                         }
                         if (window.location.pathname == '/teacher/plan') {

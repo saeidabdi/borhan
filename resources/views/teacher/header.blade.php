@@ -52,6 +52,12 @@
                             دانش آموزان
                         </a>
                     </li>
+                    <li class="active">
+                        <a class="dropdown-item" href="/teacher/exam">
+                            <span style="margin-left: 5px" class="fas fa-table mr-3"></span>
+                            امتحانات
+                        </a>
+                    </li>
                     <li class="active dropdown">
                         <a href="/teacher/plan">
                             <span style="margin-left: 5px" class="fas fa-tasks mr-3"></span>

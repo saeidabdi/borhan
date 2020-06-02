@@ -35138,7 +35138,7 @@ var app = new Vue({
             'آخرین معدل': 'last_avg'
 
         },
-        detale: []
+        detale: [], exam_id: '', all_exam: [], edited: 0
     },
     mounted: function mounted() {
         var a = this;
@@ -35220,13 +35220,13 @@ var app = new Vue({
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/user/getuser').then(function (response) {
                 if (response.data.username != undefined) {
-                    if (window.location.pathname == '/user/branch' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/user/admins') {
+                    if (window.location.pathname == '/user/branch' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/user/admins' || window.location.pathname == '/user/exam') {
                         _this3.get_branch();
                     }
-                    if (window.location.pathname == '/user/paye' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/admin/index' || window.location.pathname == '/admin/film' || window.location.pathname == '/admin/reportstu' || window.location.pathname == '/admin/report') {
+                    if (window.location.pathname == '/user/paye' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/admin/index' || window.location.pathname == '/admin/film' || window.location.pathname == '/admin/reportstu' || window.location.pathname == '/admin/report' || window.location.pathname == '/user/exam' || window.location.pathname == '/admin/exam') {
                         _this3.get_paye();
                     }
-                    if (window.location.pathname == '/user/reshte' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/admin/index' || window.location.pathname == '/admin/film' || window.location.pathname == '/admin/report') {
+                    if (window.location.pathname == '/user/reshte' || window.location.pathname == '/user/dars' || window.location.pathname == '/user/teacher' || window.location.pathname == '/user/stu' || window.location.pathname == '/user/film' || window.location.pathname == '/user/report' || window.location.pathname == '/user/reportstu' || window.location.pathname == '/admin/index' || window.location.pathname == '/admin/film' || window.location.pathname == '/admin/report' || window.location.pathname == '/user/exam' || window.location.pathname == '/admin/exam') {
                         _this3.get_reshte();
                     }
                     if (window.location.pathname == '/user/index') {
@@ -35991,6 +35991,99 @@ var app = new Vue({
             });
         },
 
+        // exam
+        add_exam: function add_exam() {
+            var _this45 = this;
+
+            this.isLoading = true;
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/add_exam', {
+                title: this.film_name,
+                b_id: this.branch_id,
+                p_id: this.paye_id,
+                r_id: this.reshte_id,
+                l_id: this.lesson_id,
+                t_id: this.teacher_id,
+                id: this.exam_id
+            }).then(function (response) {
+                _this45.exam_id = response.data.id;
+                if (response.data.type == 'update') {
+                    _this45.get_result_exam(response.data.id);
+                }
+                _this45.report_stu();
+                _this45.isLoading = false;
+                _this45.goto_class = 1;
+            });
+        },
+        add_grade: function add_grade() {
+            var _this46 = this;
+
+            var arrgrade = [];
+            for (var i = 0; i < this.specail_ids.length; i++) {
+                if (this.specail_ids[i]) {
+                    arrgrade.push(i + ',' + this.specail_ids[i]);
+                }
+            }
+            this.isLoading = true;
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/add_grade', {
+                exam_id: this.exam_id,
+                arrgrade: arrgrade,
+                edited: this.edited
+            }).then(function (response) {
+                _this46.isLoading = false;
+                __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, 'success');
+                _this46.goto_class = '';
+            });
+        },
+        get_exam: function get_exam() {
+            var _this47 = this;
+
+            this.isLoading = true;
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/get_exam', {
+                b_id: this.branch_id,
+                p_id: this.paye_id,
+                r_id: this.reshte_id,
+                l_id: this.lesson_id,
+                t_id: this.teacher_id
+            }).then(function (response) {
+                _this47.isLoading = false;
+                _this47.all_exam = response.data;
+            });
+        },
+        delete_exam: function delete_exam(exam_id) {
+            var _this48 = this;
+
+            this.isLoading = true;
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/delete_exam', {
+                id: exam_id
+            }).then(function (response) {
+                _this48.isLoading = false;
+                _this48.get_exam();
+                __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, 'success');
+            });
+        },
+        exam_edit: function exam_edit(exam) {
+            this.specail_ids = [];
+            this.exam_id = exam.id;
+            this.film_name = exam.title;
+            this.branch_id = exam.b_id;
+            this.paye_id = exam.p_id;
+            this.reshte_id = exam.r_id;
+            this.lesson_id = exam.l_id;
+            this.teacher_id = exam.t_id;
+        },
+        get_result_exam: function get_result_exam(id) {
+            var _this49 = this;
+
+            this.isLoading = true;
+            this.edited = 1;
+            __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/user/get_result_exam', { exam_id: id }).then(function (response) {
+                for (var i = 0; i < response.data.length; i++) {
+                    _this49.specail_ids[response.data[i].stu_id] = response.data[i].grade;
+                }
+                _this49.isLoading = false;
+            });
+        },
+
         // *********************** student
         btn_menu: function btn_menu() {
             if (this.i == 0) {
@@ -36002,7 +36095,7 @@ var app = new Vue({
             }
         },
         stu_login: function stu_login() {
-            var _this45 = this;
+            var _this50 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/stu/login', {
@@ -36010,7 +36103,7 @@ var app = new Vue({
                 pass: this.pass
 
             }).then(function (response) {
-                _this45.isLoading = false;
+                _this50.isLoading = false;
                 if (response.data.username != undefined) {
                     if (response.data.active == 1) {
                         if (getCookie('user')) {
@@ -36036,34 +36129,34 @@ var app = new Vue({
                     __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'کاربر وجود ندارد', 'warning');
                 }
             }, function (response) {
-                _this45.isLoading = false;
+                _this50.isLoading = false;
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'مشکل در اتصال به سرور', 'warning');
             });
         },
         getstu: function getstu() {
-            var _this46 = this;
+            var _this51 = this;
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/stu/getstu').then(function (response) {
                 if (response.data.username != undefined) {
                     if (window.location.pathname == '/stu/index') {
-                        _this46.get_branch_stu(response.data.id, response.data.p_id, response.data.r_id);
+                        _this51.get_branch_stu(response.data.id, response.data.p_id, response.data.r_id);
                     }
                     if (window.location.pathname == '/stu/profile') {
-                        _this46.get_profile_stu(response.data.id);
+                        _this51.get_profile_stu(response.data.id);
                     }
-                    _this46.logined = 1;
-                    _this46.stu_id = response.data.id;
-                    _this46.paye_id = response.data.p_id;
-                    _this46.reshte_id = response.data.r_id;
-                    _this46.username = response.data.username;
-                    _this46.name = response.data.name;
+                    _this51.logined = 1;
+                    _this51.stu_id = response.data.id;
+                    _this51.paye_id = response.data.p_id;
+                    _this51.reshte_id = response.data.r_id;
+                    _this51.username = response.data.username;
+                    _this51.name = response.data.name;
                 } else {
-                    _this46.logined = '';
+                    _this51.logined = '';
                 }
             });
         },
         get_branch_stu: function get_branch_stu(stu_id, p_id, r_id) {
-            var _this47 = this;
+            var _this52 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/stu/get_branch_stu', {
@@ -36071,17 +36164,17 @@ var app = new Vue({
                 p_id: p_id,
                 r_id: r_id
             }).then(function (response) {
-                _this47.isLoading = false;
-                _this47.status = response.data.status;
+                _this52.isLoading = false;
+                _this52.status = response.data.status;
                 if (response.data.status == 0) {
-                    _this47.all_branch = response.data.branch;
+                    _this52.all_branch = response.data.branch;
                 } else {
-                    _this47.all_lesson = response.data.lesson;
+                    _this52.all_lesson = response.data.lesson;
                 }
             });
         },
         show_dars: function show_dars(b_id, type) {
-            var _this48 = this;
+            var _this53 = this;
 
             this.branch_id = b_id;
             this.isLoading = true;
@@ -36092,14 +36185,14 @@ var app = new Vue({
                 p_id: this.paye_id,
                 r_id: this.reshte_id
             }).then(function (response) {
-                _this48.isLoading = false;
-                _this48.status = 1;
-                _this48.$router.push('/stu/lesson');
-                _this48.all_lesson = response.data.lesson;
+                _this53.isLoading = false;
+                _this53.status = 1;
+                _this53.$router.push('/stu/lesson');
+                _this53.all_lesson = response.data.lesson;
             });
         },
         show_film: function show_film(lesson_id) {
-            var _this49 = this;
+            var _this54 = this;
 
             this.message = '';
             this.isLoading = true;
@@ -36109,20 +36202,20 @@ var app = new Vue({
                 p_id: this.paye_id,
                 r_id: this.reshte_id
             }).then(function (response) {
-                _this49.isLoading = false;
-                _this49.status = 2;
-                _this49.$router.push('/stu/film');
+                _this54.isLoading = false;
+                _this54.status = 2;
+                _this54.$router.push('/stu/film');
 
                 if (response.data.film != 0) {
                     console.log(response.data.film);
-                    _this49.all_film = response.data.film;
+                    _this54.all_film = response.data.film;
                 } else {
-                    _this49.message = 'هیچ فیلمی موجود نمیباشد';
+                    _this54.message = 'هیچ فیلمی موجود نمیباشد';
                 }
             });
         },
         play_film: function play_film(film_id) {
-            var _this50 = this;
+            var _this55 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/stu/play_film', {
@@ -36130,11 +36223,11 @@ var app = new Vue({
                 stu_id: this.stu_id,
                 b_id: this.branch_id
             }).then(function (response) {
-                _this50.isLoading = false;
-                _this50.status = 3;
-                _this50.$router.push('/stu/play_film');
-                _this50.film_addr = response.data.film.addr;
-                _this50.view_id = response.data.view_id;
+                _this55.isLoading = false;
+                _this55.status = 3;
+                _this55.$router.push('/stu/play_film');
+                _this55.film_addr = response.data.film.addr;
+                _this55.view_id = response.data.view_id;
             });
         },
         onEnd: function onEnd() {
@@ -36145,32 +36238,32 @@ var app = new Vue({
 
         // profile
         get_profile_stu: function get_profile_stu(id) {
-            var _this51 = this;
+            var _this56 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/stu/get_profile_stu', {
                 id: id
             }).then(function (response) {
-                _this51.name = response.data[0].name;
-                _this51.gender = response.data[0].gender;
-                _this51.username = response.data[0].username;
-                _this51.paye_name = response.data[0].p_title;
-                _this51.reshte_name = response.data[0].r_title;
-                _this51.school_name = response.data[0].school;
-                _this51.birthday = response.data[0].birthday;
-                _this51.last_avg = response.data[0].last_avg;
-                _this51.addr_stu = response.data[0].addr;
-                _this51.phone_home = response.data[0].phone_home;
-                _this51.phone_father = response.data[0].phone_father;
-                _this51.phone_mother = response.data[0].phone_mother;
-                _this51.phone_stu = response.data[0].phone_stu;
-                _this51.isLoading = false;
+                _this56.name = response.data[0].name;
+                _this56.gender = response.data[0].gender;
+                _this56.username = response.data[0].username;
+                _this56.paye_name = response.data[0].p_title;
+                _this56.reshte_name = response.data[0].r_title;
+                _this56.school_name = response.data[0].school;
+                _this56.birthday = response.data[0].birthday;
+                _this56.last_avg = response.data[0].last_avg;
+                _this56.addr_stu = response.data[0].addr;
+                _this56.phone_home = response.data[0].phone_home;
+                _this56.phone_father = response.data[0].phone_father;
+                _this56.phone_mother = response.data[0].phone_mother;
+                _this56.phone_stu = response.data[0].phone_stu;
+                _this56.isLoading = false;
             });
         },
 
         // pass
         edit_pass: function edit_pass() {
-            var _this52 = this;
+            var _this57 = this;
 
             if (this.pass && this.new_pass && this.new_pass2 && this.new_pass == this.new_pass2) {
                 this.isLoading = true;
@@ -36179,7 +36272,7 @@ var app = new Vue({
                     pass: this.pass,
                     new_pass: this.new_pass
                 }).then(function (response) {
-                    _this52.isLoading = false;
+                    _this57.isLoading = false;
                     __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, '');
                 });
             } else {
@@ -36189,7 +36282,7 @@ var app = new Vue({
 
         // **************************** teach
         teach_login: function teach_login() {
-            var _this53 = this;
+            var _this58 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/teacher/login', {
@@ -36197,7 +36290,7 @@ var app = new Vue({
                 pass: this.pass
 
             }).then(function (response) {
-                _this53.isLoading = false;
+                _this58.isLoading = false;
                 if (response.data.username != undefined) {
                     __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', ' استاد گرامی ' + response.data.name + ' شما وارد شدید', 'success');
                     location.href = "/teacher/index";
@@ -36205,35 +36298,35 @@ var app = new Vue({
                     __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'کاربر وجود ندارد', 'warning');
                 }
             }, function (response) {
-                _this53.isLoading = false;
+                _this58.isLoading = false;
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'مشکل در اتصال به سرور', 'warning');
             });
         },
         getteach: function getteach() {
-            var _this54 = this;
+            var _this59 = this;
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.get('/teacher/getteach').then(function (response) {
                 if (response.data.username != undefined) {
-                    _this54.teacher_id = response.data.id;
+                    _this59.teacher_id = response.data.id;
                     if (window.location.pathname == '/teacher/index') {
-                        _this54.get_paye_teacher(response.data.id);
+                        _this59.get_paye_teacher(response.data.id);
                     }
-                    if (window.location.pathname == '/teacher/dars' || window.location.pathname == '/teacher/reportstu') {
-                        _this54.get_branch_teacher(response.data.id);
+                    if (window.location.pathname == '/teacher/dars' || window.location.pathname == '/teacher/reportstu' || window.location.pathname == '/teacher/exam') {
+                        _this59.get_branch_teacher(response.data.id);
                     }
                     if (window.location.pathname == '/teacher/plan') {
-                        _this54.get_teacher_class();
+                        _this59.get_teacher_class();
                     }
-                    _this54.logined = 1;
-                    _this54.username = response.data.username;
-                    _this54.name = response.data.name;
+                    _this59.logined = 1;
+                    _this59.username = response.data.username;
+                    _this59.name = response.data.name;
                 } else {
-                    _this54.logined = '';
+                    _this59.logined = '';
                 }
             });
         },
         get_paye_teacher: function get_paye_teacher(teacher_id) {
-            var _this55 = this;
+            var _this60 = this;
 
             var b = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
@@ -36242,8 +36335,8 @@ var app = new Vue({
                 __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/teacher/get_paye_teacher', {
                     id: teacher_id
                 }).then(function (response) {
-                    _this55.isLoading = false;
-                    _this55.all_paye = response.data;
+                    _this60.isLoading = false;
+                    _this60.all_paye = response.data;
                 });
             } else {
                 this.isLoading = true;
@@ -36251,13 +36344,13 @@ var app = new Vue({
                     id: teacher_id,
                     branch_id: this.branch_id
                 }).then(function (response) {
-                    _this55.isLoading = false;
-                    _this55.all_paye = response.data;
+                    _this60.isLoading = false;
+                    _this60.all_paye = response.data;
                 });
             }
         },
         get_lesson_teacher: function get_lesson_teacher() {
-            var _this56 = this;
+            var _this61 = this;
 
             this.all_lesson = [];
             this.isLoading = true;
@@ -36266,12 +36359,12 @@ var app = new Vue({
                 paye_id: this.paye_id,
                 reshte_id: this.reshte_id
             }).then(function (response) {
-                _this56.isLoading = false;
-                _this56.all_lesson = response.data;
+                _this61.isLoading = false;
+                _this61.all_lesson = response.data;
             });
         },
         get_reshte_teacher: function get_reshte_teacher() {
-            var _this57 = this;
+            var _this62 = this;
 
             this.isLoading = true;
             if (this.branch_type == 1) {
@@ -36279,7 +36372,7 @@ var app = new Vue({
                     id: this.teacher_id,
                     paye_id: this.paye_id
                 }).then(function (response) {
-                    _this57.all_reshte = response.data;
+                    _this62.all_reshte = response.data;
                 });
             } else {
                 this.reshte_id = '';
@@ -36288,19 +36381,19 @@ var app = new Vue({
             this.get_lesson_teacher();
         },
         get_branch_teacher: function get_branch_teacher(id) {
-            var _this58 = this;
+            var _this63 = this;
 
             this.isLoading = true;
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/teacher/get_branch_teacher', {
                 id: id
             }).then(function (response) {
-                _this58.isLoading = false;
-                _this58.all_branch = response.data;
+                _this63.isLoading = false;
+                _this63.all_branch = response.data;
             });
             this.get_lesson_teacher();
         },
         edit_pass_teacher: function edit_pass_teacher() {
-            var _this59 = this;
+            var _this64 = this;
 
             if (this.pass && this.new_pass && this.new_pass2 && this.new_pass == this.new_pass2) {
                 this.isLoading = true;
@@ -36309,7 +36402,7 @@ var app = new Vue({
                     pass: this.pass,
                     new_pass: this.new_pass
                 }).then(function (response) {
-                    _this59.isLoading = false;
+                    _this64.isLoading = false;
                     __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', response.data.mes, '');
                 });
             } else {
@@ -36317,7 +36410,7 @@ var app = new Vue({
             }
         },
         report_stu_teacher: function report_stu_teacher() {
-            var _this60 = this;
+            var _this65 = this;
 
             if (this.branch_id && this.paye_id && this.lesson_id) {
                 this.isLoading = true;
@@ -36327,8 +36420,8 @@ var app = new Vue({
                     r_id: this.reshte_id,
                     l_id: this.lesson_id
                 }).then(function (response) {
-                    _this60.isLoading = false;
-                    _this60.all_stu = response.data;
+                    _this65.isLoading = false;
+                    _this65.all_stu = response.data;
                 });
             } else {
                 __WEBPACK_IMPORTED_MODULE_0_sweetalert2___default.a.fire('', 'لطفا تمام فیلد ها رو کامل کنید', 'warning');
@@ -36337,14 +36430,14 @@ var app = new Vue({
 
         // **************************** admin
         get_branch_admin: function get_branch_admin(b_id) {
-            var _this61 = this;
+            var _this66 = this;
 
             __WEBPACK_IMPORTED_MODULE_1_axios___default.a.post('/admin/get_branch_admin', {
                 id: b_id
             }).then(function (response) {
                 if (response.data.type == 0) {
-                    _this61.lesson_id = 0;
-                    _this61.new_pass2 = 1;
+                    _this66.lesson_id = 0;
+                    _this66.new_pass2 = 1;
                 }
             });
         }

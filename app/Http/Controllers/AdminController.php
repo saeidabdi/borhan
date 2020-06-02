@@ -32,4 +32,8 @@ class AdminController extends Controller
     public function pass(){
         return view('admin.pass');
     }
+
+    public function exam(){
+        return view('admin.exam');
+    }
 }
